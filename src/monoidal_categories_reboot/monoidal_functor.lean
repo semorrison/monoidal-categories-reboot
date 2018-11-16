@@ -105,7 +105,6 @@ F.to_functor.on_iso f
 
 @[search] lemma map_comp (F : monoidal_functor C D) {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
   F.map (f ≫ g) = F.map f ≫ F.map g := F.map_comp' f g
-
 end monoidal_functor
 
 section

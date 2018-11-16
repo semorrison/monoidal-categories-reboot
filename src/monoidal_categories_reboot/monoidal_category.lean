@@ -73,6 +73,16 @@ infixr ` ⊗ `:80 := tensor_hom
 { obj := λ X, X.1 ⊗ X.2,
   map := λ {X Y : C × C} (f : X ⟶ Y), f.1 ⊗ f.2 }
 
+variables {C}
+
+def tensor_on_left (Y : C) : C ⥤ C :=
+{ obj := λ X, Y ⊗ X,
+  map := λ (X X') (f : X ⟶ X'), 𝟙 Y ⊗ f }
+
+def tensor_on_right (Y : C) : C ⥤ C :=
+{ obj := λ X, X ⊗ Y,
+  map := λ (X X') (f : X ⟶ X'), f ⊗ 𝟙 Y }
+
 variables {U V W X Y Z : C}
 
 @[search] definition interchange (f : U ⟶ V) (g : V ⟶ W) (h : X ⟶ Y) (k : Y ⟶ Z)
@@ -100,6 +110,8 @@ begin
   rw ←interchange,
   simp
 end
+
+variables (C)
 
 open monoidal_category
 
