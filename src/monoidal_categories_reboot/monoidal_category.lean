@@ -6,6 +6,7 @@ import category_theory.products
 import category_theory.natural_isomorphism
 import category_theory.tactics.obviously -- Give ourselves access to `rewrite_search`
 import .tensor_product
+import tactic.squeeze
 
 open category_theory
 open tactic
@@ -17,6 +18,48 @@ open category_theory.functor
 open category_theory.prod
 open category_theory.functor.category.nat_trans
 open category_theory.nat_iso
+
+@[obviously] meta def obviously' (t : option (tactic unit )) : tactic unit :=
+tactic.tidy { tactics := extended_tidy_tactics }
+
+namespace category_theory
+section -- TODO these should be the original lemmas!?
+variables {C : Type u} [𝒞 : category.{u v} C]
+include 𝒞
+variables {X Y Z : C}
+
+lemma cancel_epi'  (f : X ⟶ Y) [epi f]  {g h : Y ⟶ Z} (p : f ≫ g = f ≫ h) : g = h :=
+epi.left_cancellation g h p
+lemma cancel_mono' (f : X ⟶ Y) [mono f] {g h : Z ⟶ X} (p : g ≫ f = h ≫ f) : g = h :=
+mono.right_cancellation g h p
+end
+
+section
+variables {C : Type u} [𝒞 : category.{u v} C]
+include 𝒞
+variables {X Y Z : C} (f g : X ⟶ Y) (h : Y ⟶ Z)
+
+instance inv_is_iso [is_iso f] : is_iso (inv f) :=
+{ inv := f }
+instance comp_is_iso [is_iso f] [is_iso h] : is_iso (f ≫ h) :=
+{ inv := inv h ≫ inv f }
+
+@[simp] lemma inv_id : inv (𝟙 X) = 𝟙 X := rfl
+@[simp] lemma inv_comp [is_iso f] [is_iso h] : inv (f ≫ h) = inv h ≫ inv f := rfl
+@[simp] lemma is_iso.inv_inv [is_iso f] : inv (inv f) = f := rfl
+@[simp] lemma iso.inv_inv (f : X ≅ Y) : inv (f.inv) = f.hom := rfl
+
+lemma eq_of_inv_eq [is_iso f] [is_iso g] (p : inv f = inv g) : f = g :=
+begin
+  apply cancel_epi' (inv f),
+  conv {
+    to_rhs,
+    rw p,
+  },
+  simp,
+end
+end
+end category_theory
 
 namespace category_theory.monoidal
 class monoidal_category (C : Type u) extends category.{u v} C :=
@@ -57,31 +100,28 @@ attribute [search] monoidal_category.right_unitor_naturality
 restate_axiom monoidal_category.pentagon'
 attribute [search] monoidal_category.pentagon
 restate_axiom monoidal_category.triangle'
-attribute [search] monoidal_category.triangle
-
-section
-
-variables (C : Type u) [𝒞 : monoidal_category.{u v} C]
-include 𝒞
+attribute [simp,search] monoidal_category.triangle
 
 open monoidal_category
 
 infixr ` ⊗ `:80 := tensor_obj
 infixr ` ⊗ `:80 := tensor_hom
 
+variables (C : Type u) [𝒞 : monoidal_category.{u v} C]
+include 𝒞
+
+instance tensor_is_iso {W X Y Z : C} (f : W ⟶ X) [is_iso f] (g : Y ⟶ Z) [is_iso g] : is_iso (f ⊗ g) :=
+{ inv := inv f ⊗ inv g }
+
+@[simp] lemma inv_tensor {W X Y Z : C} (f : W ⟶ X) [is_iso f] (g : Y ⟶ Z) [is_iso g] :
+  inv (f ⊗ g) = inv f ⊗ inv g
+:= rfl
+
 @[reducible] def monoidal_category.tensor : (C × C) ⥤ C :=
 { obj := λ X, X.1 ⊗ X.2,
   map := λ {X Y : C × C} (f : X ⟶ Y), f.1 ⊗ f.2 }
 
 variables {C}
-
-def tensor_on_left (Y : C) : C ⥤ C :=
-{ obj := λ X, Y ⊗ X,
-  map := λ (X X') (f : X ⟶ X'), 𝟙 Y ⊗ f }
-
-def tensor_on_right (Y : C) : C ⥤ C :=
-{ obj := λ X, X ⊗ Y,
-  map := λ (X X') (f : X ⟶ X'), f ⊗ 𝟙 Y }
 
 variables {U V W X Y Z : C}
 
@@ -111,6 +151,47 @@ begin
   simp
 end
 
+namespace monoidal_category
+open category_theory
+
+@[search] lemma associator_inv_naturality {X Y Z X' Y' Z' : C} (f : X ⟶ X') (g : Y ⟶ Y') (h : Z ⟶ Z') :
+  (f ⊗ (g ⊗ h)) ≫ (associator X' Y' Z').inv = (associator X Y Z).inv ≫ ((f ⊗ g) ⊗ h) :=
+begin
+  apply cancel_mono' (associator X' Y' Z').hom,
+  obviously
+end
+
+@[search] lemma pentagon_inv (W X Y Z : C) :
+  ((𝟙 W) ⊗ (associator X Y Z).inv) ≫ (associator W (X ⊗ Y) Z).inv ≫ ((associator W X Y).inv ⊗ (𝟙 Z))
+    = (associator W X (Y ⊗ Z)).inv ≫ (associator (W ⊗ X) Y Z).inv :=
+begin
+  apply eq_of_inv_eq,
+  dsimp,
+  repeat { rw category.assoc },
+  exact pentagon C W X Y Z
+end
+
+@[simp] lemma triangle_1 (X Y : C) :
+  (associator X (tensor_unit C) Y).hom ≫ ((𝟙 X) ⊗ (left_unitor Y).hom) = (right_unitor X).hom ⊗ 𝟙 Y :=
+triangle C X Y
+@[simp] lemma triangle_2 (X Y : C) :
+  (associator X (tensor_unit C) Y).inv ≫ (right_unitor X).hom ⊗ 𝟙 Y = ((𝟙 X) ⊗ (left_unitor Y).hom) :=
+by obviously
+@[simp] lemma triangle_3 (X Y : C) :
+  ((right_unitor X).inv ⊗ 𝟙 Y) ≫ (associator X (tensor_unit C) Y).hom = ((𝟙 X) ⊗ (left_unitor Y).inv) :=
+begin
+  apply cancel_mono' (𝟙 X ⊗ (left_unitor Y).hom),
+  simp,
+end
+@[simp] lemma triangle_4 (X Y : C) :
+  ((𝟙 X) ⊗ (left_unitor Y).inv) ≫ (associator X (tensor_unit C) Y).inv = ((right_unitor X).inv ⊗ 𝟙 Y) :=
+begin
+  apply cancel_mono' ((right_unitor X).hom ⊗ 𝟙 Y),
+  simp,
+end
+
+end monoidal_category
+
 variables (C)
 
 open monoidal_category
@@ -137,19 +218,20 @@ open monoidal_category
 @[reducible] def monoidal_category.associator_nat_iso :
   left_assoc_functor C ≅ right_assoc_functor C :=
 nat_iso.of_components
-  (by intros; simp; apply associator)
-  (by intros; simp; apply associator_naturality)
+  (by intros; dsimp; apply associator)
+  (by intros; dsimp; apply associator_naturality)
 @[reducible] def monoidal_category.left_unitor_nat_iso :
   left_unitor_functor C ≅ functor.id C :=
 nat_iso.of_components
-  (by intros; simp; apply left_unitor)
-  (by intros; simp; apply left_unitor_naturality)
+  (by intros; dsimp; apply left_unitor)
+  (by intros; dsimp; apply left_unitor_naturality)
 @[reducible] def monoidal_category.right_unitor_nat_iso :
   right_unitor_functor C ≅ functor.id C :=
 nat_iso.of_components
-  (by intros; simp; apply right_unitor)
-  (by intros; simp; apply right_unitor_naturality)
-
-end
+ -- Previously there was a `simp` here;
+ -- it's dangerous using `simp` instead of `dsimp` to produce a morphism,
+ -- as you might have some `eq.mpr`s left over.
+  (by intros; dsimp; apply right_unitor)
+  (by intros; dsimp; apply right_unitor_naturality)
 
 end category_theory.monoidal

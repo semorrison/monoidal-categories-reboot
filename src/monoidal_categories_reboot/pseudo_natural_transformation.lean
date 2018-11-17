@@ -15,8 +15,6 @@ open category_theory.nat_iso
 
 namespace category_theory.monoidal
 
-section
-
 open monoidal_category
 
 variables {C : Type u₁} [𝒞 : monoidal_category.{u₁ v₁} C]
@@ -32,11 +30,22 @@ structure pseudo_natural_transformation :=
     ((β.app X) ⊗ 𝟙 _) ≫ (associator _ _ _).hom ≫
     (𝟙 _ ⊗ (β.app Y)) ≫ (associator _ _ _).inv ≫ (G.μ X Y).hom ⊗ 𝟙 N)
 
+namespace pseudo_natural_transformation
+
+variable (H : monoidal_functor C D)
+
+def vcomp (α : pseudo_natural_transformation F G) (β : pseudo_natural_transformation G H) :
+  pseudo_natural_transformation F H :=
+{ N := α.N ⊗ β.N,
+  β := begin end
+
+}
+
+end pseudo_natural_transformation
+
 
 -- TODO define vcomp and hcomp on these
 -- TODO define modifications
 -- TODO obtain the Drinfeld centre from these, as a braided monoidal category
-
-end
 
 end category_theory.monoidal
