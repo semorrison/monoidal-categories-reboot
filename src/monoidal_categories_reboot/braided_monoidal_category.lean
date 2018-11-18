@@ -3,10 +3,11 @@ import category_theory.functor
 import category_theory.products
 import category_theory.natural_isomorphism
 import .monoidal_category
+import .monoidal_functor
 open category_theory
 open tactic
 
-universes u v
+universes u v u₁ v₁ u₂ v₂
 
 open category_theory.category
 open category_theory.functor
@@ -16,7 +17,7 @@ open category_theory.nat_iso
 
 namespace category_theory.monoidal
 
-class braided_monoidal_category (C : Type u) extends monoidal_category C :=
+class braided_monoidal_category (C : Type u) extends monoidal_category.{u v} C :=
 -- braiding natural iso:
 (braiding             : Π X Y : C, X ⊗ Y ≅ Y ⊗ X)
 (braiding_naturality' : ∀ {X X' Y Y' : C} (f : X ⟶ Y) (g : X' ⟶ Y'),
@@ -51,11 +52,12 @@ include 𝒞
   map := λ {X Y : C × C} (f : X ⟶ Y), f.1 ⊗ f.2 }
 
 open braided_monoidal_category
+open monoidal_category
 
-def braided_monoidal_category.braiding_nat_iso : braiding_functor C ≅ non_braiding_functor C :=
+def braided_monoidal_category.braiding_nat_iso : (swap C C) ⋙ tensor C ≅ tensor C :=
 nat_iso.of_components
-  (by intros; simp; apply braiding)
-  (by intros; simp; apply braiding_naturality)
+  (by intros; dsimp; apply braiding)
+  (by intros; apply braiding_naturality)
 
 end
 
@@ -65,5 +67,16 @@ class symmetric_monoidal_category (C : Type u) extends braided_monoidal_category
 
 restate_axiom symmetric_monoidal_category.symmetry'
 attribute [ematch] symmetric_monoidal_category.symmetry
+
+open braided_monoidal_category
+
+variables (C : Type u₁) [𝒞 : braided_monoidal_category.{u₁ v₁} C]
+variables (D : Type u₂) [𝒟 : braided_monoidal_category.{u₂ v₂} D]
+include 𝒞 𝒟
+
+-- FIXME fix ordering of universe levels
+-- FIXME add tensorators
+-- structure braided_functor extends F : monoidal_functor.{u₁ u₂ v₁ v₂} C D :=
+-- (w' := Π X Y : C, F.on_iso (braiding X Y) = braiding (F.obj X) (F.obj Y))
 
 end category_theory.monoidal

@@ -48,6 +48,7 @@ instance comp_is_iso [is_iso f] [is_iso h] : is_iso (f ≫ h) :=
 @[simp] lemma inv_comp [is_iso f] [is_iso h] : inv (f ≫ h) = inv h ≫ inv f := rfl
 @[simp] lemma is_iso.inv_inv [is_iso f] : inv (inv f) = f := rfl
 @[simp] lemma iso.inv_inv (f : X ≅ Y) : inv (f.inv) = f.hom := rfl
+@[simp] lemma iso.inv_hom (f : X ≅ Y) : inv (f.hom) = f.inv := rfl
 
 lemma eq_of_inv_eq [is_iso f] [is_iso g] (p : inv f = inv g) : f = g :=
 begin
@@ -130,14 +131,14 @@ variables {U V W X Y Z : C}
 tensor_map_comp C f h g k
 
 @[simp,search] lemma interchange_left_identity (f : W ⟶ X) (g : X ⟶ Y) :
-  (f ⊗ (𝟙 Z)) ≫ (g ⊗ (𝟙 Z)) = (f ≫ g) ⊗ (𝟙 Z) :=
+  (f ≫ g) ⊗ (𝟙 Z) = (f ⊗ (𝟙 Z)) ≫ (g ⊗ (𝟙 Z)) :=
 begin
   rw ←interchange,
   simp
 end
 
 @[simp,search] lemma interchange_right_identity (f : W ⟶ X) (g : X ⟶ Y) :
-  (𝟙 Z ⊗ f) ≫ (𝟙 Z ⊗ g) = (𝟙 Z) ⊗ (f ≫ g) :=
+  (𝟙 Z) ⊗ (f ≫ g) = (𝟙 Z ⊗ f) ≫ (𝟙 Z ⊗ g) :=
 begin
   rw ←interchange,
   simp
@@ -171,24 +172,44 @@ begin
   exact pentagon C W X Y Z
 end
 
-@[simp] lemma triangle_1 (X Y : C) :
+@[simp,search] lemma triangle_1 (X Y : C) :
   (associator X (tensor_unit C) Y).hom ≫ ((𝟙 X) ⊗ (left_unitor Y).hom) = (right_unitor X).hom ⊗ 𝟙 Y :=
 triangle C X Y
-@[simp] lemma triangle_2 (X Y : C) :
+@[simp,search] lemma triangle_2 (X Y : C) :
   (associator X (tensor_unit C) Y).inv ≫ (right_unitor X).hom ⊗ 𝟙 Y = ((𝟙 X) ⊗ (left_unitor Y).hom) :=
 by obviously
-@[simp] lemma triangle_3 (X Y : C) :
+@[simp,search] lemma triangle_3 (X Y : C) :
   ((right_unitor X).inv ⊗ 𝟙 Y) ≫ (associator X (tensor_unit C) Y).hom = ((𝟙 X) ⊗ (left_unitor Y).inv) :=
 begin
   apply cancel_mono' (𝟙 X ⊗ (left_unitor Y).hom),
-  simp,
-end
-@[simp] lemma triangle_4 (X Y : C) :
+  obviously,
+end.
+@[simp,search] lemma triangle_4 (X Y : C) :
   ((𝟙 X) ⊗ (left_unitor Y).inv) ≫ (associator X (tensor_unit C) Y).inv = ((right_unitor X).inv ⊗ 𝟙 Y) :=
 begin
   apply cancel_mono' ((right_unitor X).hom ⊗ 𝟙 Y),
-  simp,
+  obviously,
+end.
+
+@[simp,search] lemma triangle_right (X Y : C) :
+  (associator X Y _).inv ≫ (right_unitor (X ⊗ Y)).hom = 𝟙 X ⊗ (right_unitor Y).hom :=
+sorry
+@[simp,search] lemma triangle_right_inv (X Y : C) :
+  (right_unitor (X ⊗ Y)).inv ≫ (associator X Y _).hom = 𝟙 X ⊗ (right_unitor Y).inv :=
+begin
+  apply eq_of_inv_eq,
+  obviously,
 end
+@[simp,search] lemma triangle_left (X Y : C) :
+  (associator _ X Y ).hom ≫ (left_unitor (X ⊗ Y)).hom = (left_unitor X).hom ⊗ 𝟙 Y :=
+sorry
+@[simp,search] lemma triangle_left_inv (X Y : C) :
+  (left_unitor (X ⊗ Y)).inv ≫ (associator _ X Y ).inv = (left_unitor X).inv ⊗ 𝟙 Y :=
+begin
+  apply eq_of_inv_eq,
+  obviously,
+end
+
 
 end monoidal_category
 
