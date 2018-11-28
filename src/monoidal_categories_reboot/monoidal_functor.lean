@@ -38,10 +38,24 @@ do repeat $ to_expr ``(category.assoc) >>= λ e, tactic.rewrite_target e {symm:=
    rotate 1,
    iterate_exactly (k+1+a-b) conv.skip
 
+/--
+`slice_lhs a b { tac }` zooms to the left hand side, uses associativity for categorical
+composition as needed, zooms in on the `a`-th through `b`-th morphisms, and invokes `tac`.
+-/
 meta def slice_lhs (a b : ℕ) (t : conv unit) : tactic unit :=
 do conv.interactive.to_lhs,
    slice a b,
    t
+
+/--
+`slice_rhs a b { tac }` zooms to the right hand side, uses associativity for categorical
+composition as needed, zooms in on the `a`-th through `b`-th morphisms, and invokes `tac`.
+-/
+meta def slice_rhs (a b : ℕ) (t : conv unit) : tactic unit :=
+do conv.interactive.to_rhs,
+   slice a b,
+   t
+
 
 universes u₁ u₂ u₃ v₁ v₂ v₃
 
