@@ -22,14 +22,21 @@ end
 
 end category_theory.is_iso
 
+namespace category_theory
+variables {C : Type u₁} [𝒞 : category.{u₁ v₁} C]
+include 𝒞
+
+def iso.infer {X Y : C} (f : X ⟶ Y) [is_iso f] : X ≅ Y :=
+{ hom := f,
+  inv := category_theory.inv f }
+end category_theory
+
+open category_theory
+
 namespace category_theory.monoidal
 
 variables {C : Type u} [𝒞 : monoidal_category.{u v} C]
 include 𝒞
-
-def iso.of_is_iso {X Y : C} (f : X ⟶ Y) [is_iso f] : X ≅ Y :=
-{ hom := f,
-  inv := inv f }
 
 
 open monoidal_category
@@ -89,32 +96,62 @@ instance drinfeld_centre_category : category.{(max u v) v} (Z.{u v} C) :=
   id := λ P, Z_hom.id P,
   comp := λ P Q R f g, Z_hom.comp f g }.
 
+@[simp] lemma drinfeld_id_hom (P : Z.{u v} C) : (𝟙 P : Z_hom P P).hom = 𝟙 P.X := rfl
+@[simp] lemma drinfeld_comp_hom {P Q R : Z.{u v} C} (f : P ⟶ Q) (g : Q ⟶ R) : 
+  (f ≫ g).hom = f.hom ≫ g.hom := rfl
+
+-- TODO derive this from the faithful functor Z C ⥤ C
+instance Z_iso {P Q : Z.{u v} C} (f : P ⟶ Q) [is_iso f.hom] : is_iso f := sorry
+
 def Z_tensor_unit : Z.{u v} C := 
 { X := tensor_unit C,
-  β := iso.of_is_iso
-  { app := λ Y, (left_unitor Y).hom ≫ (right_unitor Y).inv, 
-    naturality' := by obviously, } }
+  β := iso.infer
+  { app := λ Y, (left_unitor Y).hom ≫ (right_unitor Y).inv } }.
 
 set_option class.instance_max_depth 200
 
 def Z_tensor_obj (P Q : Z.{u v} C) : Z.{u v} C :=
 { X := P.X ⊗ Q.X,
-  β := iso.of_is_iso
+  β := 
+  iso.infer
   { app := λ Y, (associator _ _ _).hom ≫ (𝟙 _ ⊗ (Q.β.hom.app Y)) ≫ (associator _ _ _).inv ≫ ((P.β.hom.app Y) ⊗ 𝟙 _) ≫ (associator _ _ _).hom,
-    naturality' := sorry
-  } }
+    naturality' := begin tidy, sorry end
+  }
+  }
+
+@[simp] lemma Z_tensor_obj_β_hom_app (P Q : Z.{u v} C) (Y : C) : 
+  (Z_tensor_obj P Q).β.hom.app Y = 
+  (associator _ _ _).hom ≫ (𝟙 _ ⊗ (Q.β.hom.app Y)) ≫ (associator _ _ _).inv ≫ ((P.β.hom.app Y) ⊗ 𝟙 _) ≫ (associator _ _ _).hom :=
+rfl
 
 def Z_tensor_hom {P Q R S : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom R S) : 
   Z_hom (Z_tensor_obj P R) (Z_tensor_obj Q S) :=
-{ hom := f.hom ⊗ g.hom }
+{ hom := f.hom ⊗ g.hom,
+  w' := begin tidy, sorry end }.
+
+@[simp] lemma Z_tensor_hom_hom {P Q R S : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom R S) : 
+  (Z_tensor_hom f g).hom = f.hom ⊗ g.hom := rfl
+
+def Z_left_unitor (P : Z.{u v} C) : Z_tensor_obj Z_tensor_unit P ≅ P :=
+iso.infer { hom := (left_unitor P.X).hom, w' := sorry /- works, but too slow -/ }.
+
+def Z_right_unitor (P : Z.{u v} C) : Z_tensor_obj P Z_tensor_unit ≅ P :=
+iso.infer { hom := (right_unitor P.X).hom, w' := sorry /- works, but too slow -/ }.
+
+def Z_associator (P Q R : Z.{u v} C) : 
+  Z_tensor_obj (Z_tensor_obj P Q) R ≅ Z_tensor_obj P (Z_tensor_obj Q R) :=
+iso.infer
+{ hom := (associator P.X Q.X R.X).hom,
+  w' := sorry /- times out :-( -/ }.
+
 
 instance : monoidal_category.{(max u v) v} (Z.{u v} C) :=
 { tensor_unit := Z_tensor_unit,
   tensor_obj := Z_tensor_obj,
   tensor_hom := λ P Q R S f g, Z_tensor_hom f g,
-  associator := sorry,
-  left_unitor := sorry,
-  right_unitor := sorry,
+  associator := λ P Q R, Z_associator P Q R,
+  left_unitor := λ P, Z_left_unitor P,
+  right_unitor := λ P, Z_right_unitor P,
 }
 
 end category_theory.monoidal

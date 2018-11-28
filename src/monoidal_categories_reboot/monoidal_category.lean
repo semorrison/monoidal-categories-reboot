@@ -155,6 +155,20 @@ end
 namespace monoidal_category
 open category_theory
 
+@[search] lemma left_unitor_inv_naturality {X X' : C} (f : X ⟶ X') :
+  f ≫ (left_unitor X').inv = (left_unitor X).inv ≫ (𝟙 _ ⊗ f) :=
+begin
+  apply cancel_mono' (left_unitor X').hom,
+  obviously
+end
+
+@[search] lemma right_unitor_inv_naturality {X X' : C} (f : X ⟶ X') :
+  f ≫ (right_unitor X').inv = (right_unitor X).inv ≫ (f ⊗ 𝟙 _) :=
+begin
+  apply cancel_mono' (right_unitor X').hom,
+  obviously
+end
+
 @[search] lemma associator_inv_naturality {X Y Z X' Y' Z' : C} (f : X ⟶ X') (g : Y ⟶ Y') (h : Z ⟶ Z') :
   (f ⊗ (g ⊗ h)) ≫ (associator X' Y' Z').inv = (associator X Y Z).inv ≫ ((f ⊗ g) ⊗ h) :=
 begin
