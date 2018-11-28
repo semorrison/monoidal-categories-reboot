@@ -191,6 +191,8 @@ begin
   obviously,
 end.
 
+-- This is not completely trivial.
+-- See Proposition 2.2.4 of http://www-math.mit.edu/~etingof/egnobookfinal.pdf
 @[simp,search] lemma triangle_right (X Y : C) :
   (associator X Y _).inv ≫ (right_unitor (X ⊗ Y)).hom = 𝟙 X ⊗ (right_unitor Y).hom :=
 sorry
