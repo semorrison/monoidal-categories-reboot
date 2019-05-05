@@ -38,7 +38,7 @@ extends category_theory.functor C D :=
 (μ                : Π X Y : C, (obj X) ⊗ (obj Y) ≅ obj (X ⊗ Y))
 (μ_natural'       : ∀ (X Y X' Y' : C)
   (f : X ⟶ Y) (g : X' ⟶ Y'),
-  (μ X X').hom ≫ map (f ⊗ g) = ((map f) ⊗ (map g)) ≫ (μ Y Y').hom
+  ((map f) ⊗ (map g)) ≫ (μ Y Y').hom = (μ X X').hom ≫ map (f ⊗ g)
   . obviously)
 -- associativity
 (associativity'   : ∀ (X Y Z : C),
@@ -67,9 +67,28 @@ attribute [simp,search] monoidal_functor.associativity
 end
 
 namespace monoidal_functor
+
+open monoidal_category
+
+section
+
+variables {C : Type u₁} [𝒞 : monoidal_category.{v₁+1} C]
+variables {D : Type u₂} [𝒟 : monoidal_category.{v₂+1} D]
+include 𝒞 𝒟
+
+def μ_nat_iso (F : monoidal_functor C D) :
+  (functor.prod F.to_functor F.to_functor) ⋙ (tensor D) ≅ (tensor C) ⋙ F.to_functor :=
+nat_iso.of_components
+  (by intros; dsimp; apply F.μ)
+  (by intros; dsimp; apply F.μ_natural)
+
+end
+
 variables {C : Sort u₁} [𝒞 : monoidal_category.{v₁} C]
 variables {D : Sort u₂} [𝒟 : monoidal_category.{v₂} D]
 include 𝒞 𝒟
+
+
 
 -- This is unfortunate; we need all sorts of struts to give
 -- monoidal functors the features of functors...
@@ -81,16 +100,27 @@ F.to_functor.map_iso f
 
 @[search] lemma map_comp (F : monoidal_functor C D) {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
   F.map (f ≫ g) = F.map f ≫ F.map g := F.map_comp' f g
-
 end monoidal_functor
 
 section
 
 variables (C : Sort u₁) [𝒞 : monoidal_category.{v₁} C]
-variables (D : Sort u₂) [𝒟 : monoidal_category.{v₂} D]
-variables (E : Sort u₃) [ℰ : monoidal_category.{v₃} E]
+include 𝒞
 
-include 𝒞 𝒟 ℰ
+def monoidal_functor.id : monoidal_functor C C :=
+{ ε := by refl,
+  μ := λ X Y, by refl,
+  .. functor.id C }
+
+@[simp] lemma id_obj (X : C) : (monoidal_functor.id C).obj X = X := rfl
+@[simp] lemma id_map {X X' : C} (f : X ⟶ X') : (monoidal_functor.id C).map f = f :=
+rfl
+
+variables {C}
+variables {D : Sort u₂} [𝒟 : monoidal_category.{v₂} D]
+variables {E : Sort u₃} [ℰ : monoidal_category.{v₃} E]
+
+include 𝒟 ℰ
 
 open tactic.rewrite_search.tracer
 -- set_option profiler true
@@ -102,23 +132,23 @@ def monoidal_functor.comp
   μ_natural'       :=
   begin
     tidy,
-    /- `rewrite_search` says -/ -- FIXME actually, its output is broken
-    conv_lhs { congr, skip, erw [←map_comp] },
-    conv_lhs { erw [monoidal_functor.μ_natural] },
-    conv_lhs { congr, skip, erw [map_comp] },
+    /- `rewrite_search` says -/
     conv_lhs { erw [←category.assoc] },
     conv_lhs { congr, erw [monoidal_functor.μ_natural] },
-    conv_rhs { erw [←category.assoc] },
+    conv_lhs { erw [category.assoc] },
+    conv_lhs { congr, skip, erw [←map_comp] },
+    conv_rhs { congr, skip, erw [←map_comp] },
+    conv_rhs { congr, skip, erw [←monoidal_functor.μ_natural] }
   end,
   associativity'   := λ X Y Z,
   begin
     -- obviously fails here, but it seems like it should be doable!
     dsimp,
     conv { to_rhs,
-      rw ←interchange_right_identity,
+      rw interchange_right_identity,
       slice 3 4,
       rw ← G.map_id,
-      rw ← G.μ_natural,
+      rw G.μ_natural,
     },
     -- rewrite_search { view := visualiser, trace_summary := tt, explain := tt, max_iterations := 50 }, -- fails
     conv { to_rhs,
@@ -127,10 +157,10 @@ def monoidal_functor.comp
     },
     -- rewrite_search (saw/visited/used) 137/23/16 expressions during proof of category_theory.monoidal.monoidal_functor.comp
     conv { to_lhs,
-      rw ←interchange_left_identity,
+      rw interchange_left_identity,
       slice 2 3,
       rw ← G.map_id,
-      rw ← G.μ_natural, },
+      rw G.μ_natural, },
     repeat { rw category.assoc },
     repeat { rw ←G.map_comp },
     rw F.associativity,
@@ -140,15 +170,15 @@ def monoidal_functor.comp
     -- Don't attempt to read this; it is a Frankenstein effort of Scott + rewrite_search
     dsimp,
     rw G.left_unitality,
-    rw ←interchange_left_identity,
+    rw interchange_left_identity,
     repeat {rw category.assoc},
     apply congr_arg,
-    /- `rewrite_search` says -/ -- FIXME actually, its output is broken
+    /- `rewrite_search` says -/
     rw F.left_unitality,
     conv_lhs { congr, skip, erw [map_comp] },
     conv_lhs { erw [←category.id_app] },
     conv_lhs { erw [←category.assoc] },
-    conv_lhs { congr, erw [monoidal_functor.μ_natural] },
+    conv_lhs { congr, erw [←monoidal_functor.μ_natural] },
     conv_lhs { congr, congr, congr, skip, erw [map_id] },
     conv_rhs { erw [←category.assoc] },
     erw map_comp,
@@ -157,20 +187,27 @@ def monoidal_functor.comp
   begin
     dsimp,
     rw G.right_unitality,
-    rw ←interchange_right_identity,
+    rw interchange_right_identity,
     repeat {rw category.assoc},
     apply congr_arg,
-    /- `rewrite_search` says -/ -- FIXME actually, its output is broken
+    /- `rewrite_search` says -/
     rw F.right_unitality,
     conv_lhs { congr, skip, erw [map_comp] },
     conv_lhs { erw [←category.id_app] },
     conv_lhs { erw [←category.assoc] },
-    conv_lhs { congr, erw [monoidal_functor.μ_natural] },
+    conv_lhs { congr, erw [←monoidal_functor.μ_natural] },
     conv_lhs { congr, congr, congr, erw [map_id] },
     conv_rhs { erw [←category.assoc] },
     erw map_comp,
   end,
-  .. (F.to_functor) ⋙ (G.to_functor) }
+  .. (F.to_functor) ⋙ (G.to_functor) }.
+
+variables (F : monoidal_functor C D) (G : monoidal_functor D E)
+
+@[simp] lemma comp_obj (X : C) : (F.comp G).obj X = G.obj (F.obj X) := rfl
+@[simp] lemma comp_map {X X' : C} (f : X ⟶ X') :
+  begin let h := (F.comp G).map f, dsimp at h, exact h end = G.map (F.map f) :=
+rfl
 
 end
 
