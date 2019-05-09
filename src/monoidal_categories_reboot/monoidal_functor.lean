@@ -6,7 +6,6 @@ import category_theory.products
 import category_theory.natural_isomorphism
 import .tensor_product
 import .monoidal_category
-import tactic.rewrite_search
 import tactic.interactive
 
 open category_theory
@@ -87,8 +86,6 @@ namespace monoidal_functor
 
 open monoidal_category
 
-section
-
 variables {C : Type u₁} [𝒞 : monoidal_category.{v₁+1} C]
 variables {D : Type u₂} [𝒟 : monoidal_category.{v₂+1} D]
 include 𝒞 𝒟
@@ -99,23 +96,6 @@ nat_iso.of_components
   (by intros; dsimp; apply F.μ_iso)
   (by intros; dsimp; apply F.to_lax_monoidal_functor.μ_natural)
 
-end
-
-variables {C : Sort u₁} [𝒞 : monoidal_category.{v₁} C]
-variables {D : Sort u₂} [𝒟 : monoidal_category.{v₂} D]
-include 𝒞 𝒟
-
-
--- -- This is unfortunate; we need all sorts of struts to give
--- -- monoidal functors the features of functors...
--- @[reducible] def on_iso (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) {X Y : C} (f : X ≅ Y) : F.obj X ≅ F.obj Y :=
--- F.to_functor.map_iso f
-
--- @[search] lemma map_id (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) (X : C) :
---   F.map (𝟙 X) = 𝟙 (F.obj X) := F.map_id' X
-
--- @[search] lemma map_comp (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
---   F.map (f ≫ g) = F.map f ≫ F.map g := F.map_comp' f g
 end monoidal_functor
 
 section
@@ -129,8 +109,9 @@ def monoidal_functor.id : monoidal_functor.{v₁ v₁ u₁ u₁} C C :=
   .. functor.id C }
 
 @[simp] lemma id_obj (X : C) : (monoidal_functor.id C).obj X = X := rfl
-@[simp] lemma id_map {X X' : C} (f : X ⟶ X') : (monoidal_functor.id C).map f = f :=
-rfl
+@[simp] lemma id_map {X X' : C} (f : X ⟶ X') : (monoidal_functor.id C).map f = f := rfl
+@[simp] lemma id_ε : (monoidal_functor.id C).ε = 𝟙 _ := rfl
+@[simp] lemma id_μ (X Y) : (monoidal_functor.id C).μ X Y = 𝟙 _ := rfl
 
 variables {C}
 variables {D : Sort u₂} [𝒟 : monoidal_category.{v₂} D]
@@ -139,7 +120,6 @@ variables {E : Sort u₃} [ℰ : monoidal_category.{v₃} E]
 include 𝒟 ℰ
 
 open tactic.rewrite_search.tracer
--- set_option profiler true
 
 section
 variables (F : lax_monoidal_functor.{v₁ v₂ u₁ u₂} C D) (G : lax_monoidal_functor.{v₂ v₃ u₂ u₃} D E)
@@ -150,7 +130,6 @@ def lax_monoidal_functor.comp : lax_monoidal_functor.{v₁ v₃ u₁ u₃} C E :
   μ_natural'       := λ _ _ _ _ f g,
   begin
     simp only [functor.comp_map, assoc],
-    /- `rewrite_search` says -/
     conv_lhs { rw [←category.assoc], congr, rw [lax_monoidal_functor.μ_natural] },
     conv_lhs { rw [category.assoc], congr, skip, rw [←map_comp] },
     conv_rhs { congr, skip, rw [←map_comp, ←lax_monoidal_functor.μ_natural] }
