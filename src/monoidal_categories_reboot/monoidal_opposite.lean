@@ -20,7 +20,7 @@ instance monoidal_opposite : monoidal_category.{v₁} (mop C) :=
 { tensor_obj   := λ X Y, @monoidal_category.tensor_obj C _ Y X,
   tensor_hom   := λ (X₁ Y₁ X₂ Y₂ : mop C) (f : X₁ ⟶ Y₁) (g : X₂ ⟶ Y₂), @monoidal_category.tensor_hom C _ _ _ _ _ g f,
   tensor_unit  := @monoidal_category.tensor_unit C _,
-  associator   := λ X Y Z, (@monoidal_category.associator _ _ _).symm,
+  associator   := λ X Y Z, (@monoidal_category.associator _ _ _ _ _).symm,
   left_unitor  := λ X, (@monoidal_category.right_unitor _),
   right_unitor := λ X, (@monoidal_category.left_unitor _) }
 

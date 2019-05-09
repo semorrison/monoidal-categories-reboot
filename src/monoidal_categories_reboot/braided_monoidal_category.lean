@@ -1,9 +1,5 @@
-import category_theory.category
-import category_theory.functor
-import category_theory.products
-import category_theory.natural_isomorphism
-import .monoidal_category
 import .monoidal_functor
+import .monoidal_functor_attributes
 open category_theory
 open tactic
 
@@ -64,7 +60,8 @@ begin
   obviously,
 end
 
-def braided_monoidal_category.braiding_nat_iso : braiding_functor C ≅ non_braiding_functor C :=
+-- FIXME `category_theory/products/default.lean` is missing lots of simp lemmas.
+def braided_monoidal_category.braiding_nat_iso : swap C C ⋙ braiding_functor C ≅ tensor C :=
 nat_iso.of_components
   (by intros; dsimp; apply braiding)
   (by intros; apply braiding_naturality)
@@ -84,9 +81,8 @@ variables (C : Sort u₁) [𝒞 : braided_monoidal_category.{v₁} C]
 variables (D : Sort u₂) [𝒟 : braided_monoidal_category.{v₂} D]
 include 𝒞 𝒟
 
--- FIXME fix ordering of universe levels
 -- FIXME add tensorators
--- structure braided_functor extends F : monoidal_functor.{u₁ u₂ v₁ v₂} C D :=
--- (w' := Π X Y : C, F.on_iso (braiding X Y) = braiding (F.obj X) (F.obj Y))
+-- structure braided_functor extends F : monoidal_functor.{v₁ v₂} C D :=
+-- (w' := Π X Y : C, F.to_functor.map_iso (braiding X Y) = braiding (F.obj X) (F.obj Y))
 
 end category_theory.monoidal

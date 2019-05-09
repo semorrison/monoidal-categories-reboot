@@ -1,18 +1,11 @@
 -- Copyright (c) 2018 Michael Jendrusch. All rights reserved.
-
-import category_theory.category
-import category_theory.functor
+-- Released under Apache 2.0 license as described in the file LICENSE.
+-- Authors: Michael Jendrusch, Scott Morrison
 import category_theory.products
-import category_theory.natural_isomorphism
-open category_theory
 
 universes v u
 
-
-open category_theory.category
-open category_theory.functor
-open category_theory.prod
-open category_theory.functor.category.nat_trans
+open category_theory
 
 namespace category_theory.monoidal
 
@@ -22,9 +15,7 @@ C → C → C
 
 @[reducible] def tensor_hom_type
   {C : Sort u} [category.{v} C] (tensor_obj : tensor_obj_type C) : Sort (imax u u u u v) :=
-Π {X₁ Y₁ X₂ Y₂ : C}, has_hom.hom X₁ Y₁ → has_hom.hom X₂ Y₂ → has_hom.hom (tensor_obj X₁ X₂) (tensor_obj Y₁ Y₂)
-
-local attribute [tidy] tactic.assumption
+Π {X₁ Y₁ X₂ Y₂ : C}, (X₁ ⟶ Y₁) → (X₂ ⟶ Y₂) → ((tensor_obj X₁ X₂) ⟶ (tensor_obj Y₁ Y₂))
 
 def assoc_obj
   {C : Sort u} [category.{v} C] (tensor_obj : tensor_obj_type C) : Sort (max u v 1) :=

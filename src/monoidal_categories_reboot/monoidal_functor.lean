@@ -1,25 +1,15 @@
 -- Copyright (c) 2018 Michael Jendrusch. All rights reserved.
-
-import category_theory.category
-import category_theory.functor
-import category_theory.products
-import category_theory.natural_isomorphism
-import .tensor_product
+-- Released under Apache 2.0 license as described in the file LICENSE.
+-- Authors: Michael Jendrusch, Scott Morrison
 import .monoidal_category
-import tactic.interactive
 
 open category_theory
 open tactic
-
-universe u
 
 universes v₁ v₂ v₃ u₁ u₂ u₃
 
 open category_theory.category
 open category_theory.functor
-open category_theory.prod
-open category_theory.functor.category.nat_trans
-open category_theory.nat_iso
 
 namespace category_theory.monoidal
 
@@ -31,8 +21,7 @@ variables (C : Sort u₁) [𝒞 : monoidal_category.{v₁} C]
           (D : Sort u₂) [𝒟 : monoidal_category.{v₂} D]
 include 𝒞 𝒟
 
-structure lax_monoidal_functor
-extends category_theory.functor.{v₁ v₂ u₁ u₂} C D :=
+structure lax_monoidal_functor extends C ⥤ D :=
 -- unit morphism
 (ε               : tensor_unit D ⟶ obj (tensor_unit C))
 -- tensorator
@@ -41,7 +30,7 @@ extends category_theory.functor.{v₁ v₂ u₁ u₂} C D :=
   (f : X ⟶ Y) (g : X' ⟶ Y'),
   ((map f) ⊗ (map g)) ≫ μ Y Y' = μ X X' ≫ map (f ⊗ g)
   . obviously)
--- associativity
+-- associativity of the tensorator
 (associativity'   : ∀ (X Y Z : C),
     (μ X Y ⊗ 𝟙 (obj Z)) ≫ μ (X ⊗ Y) Z ≫ map (associator X Y Z).hom
   = (associator (obj X) (obj Y) (obj Z)).hom ≫ (𝟙 (obj X) ⊗ μ Y Z) ≫ μ X (Y ⊗ Z)
@@ -70,17 +59,17 @@ attribute [simp] lax_monoidal_functor.associativity
 -- lax_monoidal_functor.right_unitality lax_monoidal_functor.associativity
 
 structure monoidal_functor
-extends lax_monoidal_functor.{v₁ v₂ u₁ u₂} C D :=
+extends lax_monoidal_functor.{v₁ v₂} C D :=
 (ε_is_iso            : is_iso ε . obviously)
 (μ_is_iso            : Π X Y : C, is_iso (μ X Y) . obviously)
 
 attribute [instance] monoidal_functor.ε_is_iso monoidal_functor.μ_is_iso
 
 variables {C D}
-def monoidal_functor.ε_iso (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) :
+def monoidal_functor.ε_iso (F : monoidal_functor.{v₁ v₂} C D) :
   tensor_unit D ≅ F.obj (tensor_unit C) :=
 as_iso F.ε
-def monoidal_functor.μ_iso (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) (X Y : C) :
+def monoidal_functor.μ_iso (F : monoidal_functor.{v₁ v₂} C D) (X Y : C) :
   (F.obj X) ⊗ (F.obj Y) ≅ F.obj (X ⊗ Y) :=
 as_iso (F.μ X Y)
 
@@ -90,11 +79,13 @@ namespace monoidal_functor
 
 open monoidal_category
 
+-- In order to express the tensorator as a natural isomorphism,
+-- we need to be in at least `Type 0`, so we have products.
 variables {C : Type u₁} [𝒞 : monoidal_category.{v₁+1} C]
 variables {D : Type u₂} [𝒟 : monoidal_category.{v₂+1} D]
 include 𝒞 𝒟
 
-def μ_nat_iso (F : monoidal_functor.{v₁+1 v₂+1 u₁+1 u₂+1} C D) :
+def μ_nat_iso (F : monoidal_functor.{v₁+1 v₂+1} C D) :
   (functor.prod F.to_functor F.to_functor) ⋙ (tensor D) ≅ (tensor C) ⋙ F.to_functor :=
 nat_iso.of_components
   (by intros; dsimp; apply F.μ_iso)
@@ -107,7 +98,7 @@ section
 variables (C : Sort u₁) [𝒞 : monoidal_category.{v₁} C]
 include 𝒞
 
-def monoidal_functor.id : monoidal_functor.{v₁ v₁ u₁ u₁} C C :=
+def monoidal_functor.id : monoidal_functor.{v₁ v₁} C C :=
 { ε := 𝟙 _,
   μ := λ X Y, 𝟙 _,
   .. functor.id C }
@@ -124,9 +115,9 @@ variables {E : Sort u₃} [ℰ : monoidal_category.{v₃} E]
 include 𝒟 ℰ
 
 section
-variables (F : lax_monoidal_functor.{v₁ v₂ u₁ u₂} C D) (G : lax_monoidal_functor.{v₂ v₃ u₂ u₃} D E)
+variables (F : lax_monoidal_functor.{v₁ v₂} C D) (G : lax_monoidal_functor.{v₂ v₃} D E)
 
-def lax_monoidal_functor.comp : lax_monoidal_functor.{v₁ v₃ u₁ u₃} C E :=
+def lax_monoidal_functor.comp : lax_monoidal_functor.{v₁ v₃} C E :=
 { ε                := G.ε ≫ (G.map F.ε),
   μ                := λ X Y, G.μ (F.obj X) (F.obj Y) ≫ G.map (F.μ X Y),
   μ_natural'       := λ _ _ _ _ f g,
@@ -177,24 +168,19 @@ def lax_monoidal_functor.comp : lax_monoidal_functor.{v₁ v₃ u₁ u₃} C E :
   .. (F.to_functor) ⋙ (G.to_functor) }.
 
 @[simp] lemma lax_monoidal_functor.comp_obj (X : C) : (F.comp G).obj X = G.obj (F.obj X) := rfl
+@[simp] lemma lax_monoidal_functor.comp_map {X X' : C} (f : X ⟶ X') :
+  (F.comp G).map f = (G.map (F.map f) : G.obj (F.obj X) ⟶ G.obj (F.obj X')) := rfl
 @[simp] lemma lax_monoidal_functor.comp_ε : (F.comp G).ε = G.ε ≫ (G.map F.ε) := rfl
 @[simp] lemma lax_monoidal_functor.comp_μ (X Y : C) : (F.comp G).μ X Y = G.μ (F.obj X) (F.obj Y) ≫ G.map (F.μ X Y) := rfl
 end
 
 section
-variables (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) (G : monoidal_functor.{v₂ v₃ u₂ u₃} D E)
+variables (F : monoidal_functor.{v₁ v₂} C D) (G : monoidal_functor.{v₂ v₃} D E)
 
-def monoidal_functor.comp : monoidal_functor.{v₁ v₃ u₁ u₃} C E :=
+def monoidal_functor.comp : monoidal_functor.{v₁ v₃} C E :=
 { ε_is_iso         := by { dsimp, apply_instance }, -- TODO tidy should get this
   μ_is_iso         := by { dsimp, apply_instance }, -- TODO tidy should get this
   .. (F.to_lax_monoidal_functor).comp (G.to_lax_monoidal_functor) }.
-
-@[simp] lemma monoidal_functor.comp_obj (X : C) : (F.comp G).obj X = G.obj (F.obj X) := rfl
--- FIXME why doesn't this work?
--- @[simp] lemma comp_map {X X' : C} (f : X ⟶ X') :
---   ((((F.comp G) : monoidal_functor.{v₁ v₃ u₁ u₃} C E).map f) : G.obj (F.obj X) ⟶ G.obj (F.obj X')) =
---    (G.map (F.map f) : G.obj (F.obj X) ⟶ G.obj (F.obj X')) :=
--- rfl
 
 end
 end

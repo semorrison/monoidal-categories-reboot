@@ -1,12 +1,9 @@
 -- Copyright (c) 2018 Michael Jendrusch. All rights reserved.
-
-import category_theory.category
-import category_theory.functor
-import category_theory.products
-import category_theory.natural_isomorphism
+-- Released under Apache 2.0 license as described in the file LICENSE.
+-- Authors: Michael Jendrusch, Scott Morrison
 import .tensor_product
--- import category_theory.tactics.obviously
-import tactic
+import category_theory.natural_isomorphism
+import tactic -- TODO switch this back to tactic.basic once relevant PRs land.
 import tactic.slice
 
 open category_theory
@@ -15,13 +12,6 @@ open tactic
 universes v u
 
 open category_theory.category
-open category_theory.functor
-open category_theory.prod
-open category_theory.functor.category.nat_trans
-open category_theory.nat_iso
-
--- @[obviously] meta def obviously' (t : option (tactic unit )) : tactic unit :=
--- tactic.tidy { tactics := extended_tidy_tactics }
 
 namespace category_theory
 section -- TODO these should be the original lemmas!?
