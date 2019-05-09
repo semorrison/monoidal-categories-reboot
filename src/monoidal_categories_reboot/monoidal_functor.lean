@@ -106,17 +106,16 @@ variables {D : Sort u₂} [𝒟 : monoidal_category.{v₂} D]
 include 𝒞 𝒟
 
 
+-- -- This is unfortunate; we need all sorts of struts to give
+-- -- monoidal functors the features of functors...
+-- @[reducible] def on_iso (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) {X Y : C} (f : X ≅ Y) : F.obj X ≅ F.obj Y :=
+-- F.to_functor.map_iso f
 
--- This is unfortunate; we need all sorts of struts to give
--- monoidal functors the features of functors...
-@[reducible] def on_iso (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) {X Y : C} (f : X ≅ Y) : F.obj X ≅ F.obj Y :=
-F.to_functor.map_iso f
+-- @[search] lemma map_id (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) (X : C) :
+--   F.map (𝟙 X) = 𝟙 (F.obj X) := F.map_id' X
 
-@[search] lemma map_id (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) (X : C) :
-  F.map (𝟙 X) = 𝟙 (F.obj X) := F.map_id' X
-
-@[search] lemma map_comp (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
-  F.map (f ≫ g) = F.map f ≫ F.map g := F.map_comp' f g
+-- @[search] lemma map_comp (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
+--   F.map (f ≫ g) = F.map f ≫ F.map g := F.map_comp' f g
 end monoidal_functor
 
 section
@@ -166,7 +165,7 @@ def monoidal_functor.comp
     conv { to_rhs,
       rw interchange_right_identity,
       slice 3 4,
-      rw ← G.map_id,
+      rw ← G.to_functor.map_id,
       rw G.to_lax_monoidal_functor.μ_natural,
     },
     -- rewrite_search { view := visualiser, trace_summary := tt, explain := tt, max_iterations := 50 }, -- fails
@@ -178,10 +177,10 @@ def monoidal_functor.comp
     conv { to_lhs,
       rw interchange_left_identity,
       slice 2 3,
-      rw ← G.map_id,
+      rw ← G.to_functor.map_id,
       rw G.to_lax_monoidal_functor.μ_natural, },
     repeat { rw category.assoc },
-    repeat { rw ←G.map_comp },
+    repeat { rw ←G.to_functor.map_comp },
     rw F.to_lax_monoidal_functor.associativity,
   end,
   left_unitality'  := λ X,
