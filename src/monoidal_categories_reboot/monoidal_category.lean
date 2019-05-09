@@ -97,9 +97,6 @@ restate_axiom monoidal_category.pentagon'
 restate_axiom monoidal_category.triangle'
 attribute [simp] monoidal_category.triangle
 
--- meta def rws : tactic string := `[rewrite_search { explain := tt }] >> pure ""
--- @[obviously] meta def obviously'' := tactic.tidy {tactics := tidy.default_tactics ++ [rws]}
-
 open monoidal_category
 
 infixr ` ⊗ `:70 := tensor_obj
@@ -109,21 +106,10 @@ def tensor_iso {C : Sort u} {X Y X' Y' : C} [monoidal_category.{v} C] (f : X ≅
     X ⊗ X' ≅ Y ⊗ Y' :=
 { hom := f.hom ⊗ g.hom,
   inv := f.inv ⊗ g.inv,
-  hom_inv_id' :=
-  begin
-    conv_lhs { rw [←tensor_map_comp] },
-    conv_lhs { congr, rw [iso.hom_inv_id], skip, rw [iso.hom_inv_id] },
-    conv_rhs { rw [←tensor_map_id] }
-  end,
-  inv_hom_id' :=
-  begin
-    conv_lhs { rw [←tensor_map_comp] },
-    conv_lhs { congr, rw [iso.inv_hom_id], skip, rw [iso.inv_hom_id] },
-    conv_rhs { rw [←tensor_map_id] }
-  end }
+  hom_inv_id' := by rw [←tensor_map_comp, iso.hom_inv_id, iso.hom_inv_id, ←tensor_map_id],
+  inv_hom_id' := by rw [←tensor_map_comp, iso.inv_hom_id, iso.inv_hom_id, ←tensor_map_id] }
 
 infixr ` ⊗ `:70 := tensor_iso
-
 
 section
 
@@ -190,10 +176,9 @@ begin
   conv_rhs { rw [category.id_comp] }
 end
 
-
 @[simp] lemma tensor_left_iff
-    {X Y : C} (f g : X ⟶ Y) :
-    ((𝟙 (tensor_unit C)) ⊗ f = (𝟙 (tensor_unit C)) ⊗ g) ↔ (f = g) :=
+  {X Y : C} (f g : X ⟶ Y) :
+  ((𝟙 (tensor_unit C)) ⊗ f = (𝟙 (tensor_unit C)) ⊗ g) ↔ (f = g) :=
 begin
   split,
   { intro h,
@@ -206,8 +191,8 @@ begin
 end
 
 @[simp] lemma tensor_right_iff
-    {X Y : C} (f g : X ⟶ Y) :
-    (f ⊗ (𝟙 (tensor_unit C)) = g ⊗ (𝟙 (tensor_unit C))) ↔ (f = g) :=
+  {X Y : C} (f g : X ⟶ Y) :
+  (f ⊗ (𝟙 (tensor_unit C)) = g ⊗ (𝟙 (tensor_unit C))) ↔ (f = g) :=
 begin
   split,
   { intro h,
@@ -342,7 +327,6 @@ by rw [←tensor_right_iff, interchange_left_identity, right_unitor_product_aux]
     ((right_unitor (X ⊗ Y)).inv) :=
 eq_of_inv_eq _ _ (by simp)
 
-
 lemma associator_inv_naturality {X Y Z X' Y' Z' : C} (f : X ⟶ X') (g : Y ⟶ Y') (h : Z ⟶ Z') :
   (f ⊗ (g ⊗ h)) ≫ (associator X' Y' Z').inv = (associator X Y Z).inv ≫ ((f ⊗ g) ⊗ h) :=
 begin
@@ -394,58 +378,64 @@ end
 
 end
 
-section
+namespace monoidal_category
 
 -- In order to be able to describe the tensor product as a functor, we
--- need to be up in at least `Type 1` for both objects and morphisms,
+-- need to be up in at least `Type 0` for both objects and morphisms,
 -- so that we can construct products.
 variables (C : Type u) [𝒞 : monoidal_category.{v+1} C]
 include 𝒞
 
--- TODO replace all these @[simp] annotations with simp lemmas for the projections
-
-@[simp] def monoidal_category.tensor : (C × C) ⥤ C :=
+def monoidal_category.tensor : (C × C) ⥤ C :=
 { obj := λ X, tensor_obj X.1 X.2,
   map := λ {X Y : C × C} (f : X ⟶ Y), tensor_hom f.1 f.2 }
 
-@[simp] def monoidal_category.triple_tensor_left : (C × C × C) ⥤ C :=
+def left_assoc_tensor : (C × C × C) ⥤ C :=
 { obj := λ X, (X.1 ⊗ X.2.1) ⊗ X.2.2,
-  map := λ {X Y : C × C × C} (f : X ⟶ Y),
-    (f.1 ⊗ f.2.1) ⊗ f.2.2 }
-@[simp] def monoidal_category.triple_tensor_right : (C × C × C) ⥤ C :=
+  map := λ {X Y : C × C × C} (f : X ⟶ Y), (f.1 ⊗ f.2.1) ⊗ f.2.2 }
+
+@[simp] lemma left_assoc_tensor_obj (X) :
+  (left_assoc_tensor C).obj X = (X.1 ⊗ X.2.1) ⊗ X.2.2 := rfl
+@[simp] lemma left_assoc_tensor_map {X Y} (f : X ⟶ Y) :
+  (left_assoc_tensor C).map f = (f.1 ⊗ f.2.1) ⊗ f.2.2 := rfl
+
+def right_assoc_tensor : (C × C × C) ⥤ C :=
 { obj := λ X, X.1 ⊗ (X.2.1 ⊗ X.2.2),
-  map := λ {X Y : C × C × C} (f : X ⟶ Y),
-    f.1 ⊗ (f.2.1 ⊗ f.2.2) }
-@[simp] def monoidal_category.tensor_unit_left : C ⥤ C :=
+  map := λ {X Y : C × C × C} (f : X ⟶ Y), f.1 ⊗ (f.2.1 ⊗ f.2.2) }
+
+@[simp] lemma right_assoc_tensor_obj (X) :
+  (right_assoc_tensor C).obj X = X.1 ⊗ (X.2.1 ⊗ X.2.2) := rfl
+@[simp] lemma right_assoc_tensor_map {X Y} (f : X ⟶ Y) :
+  (right_assoc_tensor C).map f = f.1 ⊗ (f.2.1 ⊗ f.2.2) := rfl
+
+def tensor_unit_left : C ⥤ C :=
 { obj := λ X, tensor_unit C ⊗ X,
   map := λ {X Y : C} (f : X ⟶ Y), (𝟙 (tensor_unit C)) ⊗ f }
-@[simp] def monoidal_category.tensor_unit_right : C ⥤ C :=
+def tensor_unit_right : C ⥤ C :=
 { obj := λ X, X ⊗ tensor_unit C,
   map := λ {X Y : C} (f : X ⟶ Y), f ⊗ (𝟙 (tensor_unit C)) }
-
-open monoidal_category
 
 -- We can express the associator and the unitors, given componentwise above,
 -- as natural isomorphisms.
 
-def monoidal_category.associator_nat_iso :
-  triple_tensor_left C ≅ triple_tensor_right C :=
+def associator_nat_iso :
+  left_assoc_tensor C ≅ right_assoc_tensor C :=
 nat_iso.of_components
   (by intros; dsimp; apply monoidal_category.associator)
   (by intros; dsimp; apply monoidal_category.associator_naturality)
 
-def monoidal_category.left_unitor_nat_iso :
+def left_unitor_nat_iso :
   tensor_unit_left C ≅ functor.id C :=
 nat_iso.of_components
   (by intros; dsimp; apply monoidal_category.left_unitor)
   (by intros; dsimp; apply monoidal_category.left_unitor_naturality)
 
-def monoidal_category.right_unitor_nat_iso :
+def right_unitor_nat_iso :
   tensor_unit_right C ≅ functor.id C :=
 nat_iso.of_components
   (by intros; dsimp; apply monoidal_category.right_unitor)
   (by intros; dsimp; apply monoidal_category.right_unitor_naturality)
 
-end
+end monoidal_category
 
 end category_theory.monoidal

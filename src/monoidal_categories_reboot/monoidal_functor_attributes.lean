@@ -19,3 +19,7 @@ right_unitor_inv_naturality
 
 lax_monoidal_functor.μ_natural lax_monoidal_functor.left_unitality
 lax_monoidal_functor.right_unitality lax_monoidal_functor.associativity
+
+meta def rws : tactic string := `[rewrite_search { explain := tt }] >> pure ""
+@[obviously] meta def obviously'' := tactic.tidy {tactics := tidy.default_tactics ++ [rws]}
+

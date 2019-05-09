@@ -66,6 +66,7 @@ extends lax_monoidal_functor.{v₁ v₂} C D :=
 attribute [instance] monoidal_functor.ε_is_iso monoidal_functor.μ_is_iso
 
 variables {C D}
+
 def monoidal_functor.ε_iso (F : monoidal_functor.{v₁ v₂} C D) :
   tensor_unit D ≅ F.obj (tensor_unit C) :=
 as_iso F.ε
@@ -117,6 +118,7 @@ include 𝒟 ℰ
 section
 variables (F : lax_monoidal_functor.{v₁ v₂} C D) (G : lax_monoidal_functor.{v₂ v₃} D E)
 
+-- The proofs here are horrendous; rewrite_search helps a lot.
 def lax_monoidal_functor.comp : lax_monoidal_functor.{v₁ v₃} C E :=
 { ε                := G.ε ≫ (G.map F.ε),
   μ                := λ X Y, G.μ (F.obj X) (F.obj Y) ≫ G.map (F.μ X Y),
@@ -178,8 +180,8 @@ section
 variables (F : monoidal_functor.{v₁ v₂} C D) (G : monoidal_functor.{v₂ v₃} D E)
 
 def monoidal_functor.comp : monoidal_functor.{v₁ v₃} C E :=
-{ ε_is_iso         := by { dsimp, apply_instance }, -- TODO tidy should get this
-  μ_is_iso         := by { dsimp, apply_instance }, -- TODO tidy should get this
+{ ε_is_iso := by { dsimp, apply_instance }, -- TODO tidy should get this
+  μ_is_iso := by { dsimp, apply_instance }, -- TODO tidy should get this
   .. (F.to_lax_monoidal_functor).comp (G.to_lax_monoidal_functor) }.
 
 end
