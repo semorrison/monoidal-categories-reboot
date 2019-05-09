@@ -57,13 +57,17 @@ extends category_theory.functor.{v₁ v₂ u₁ u₂} C D :=
   . obviously)
 
 restate_axiom lax_monoidal_functor.μ_natural'
-attribute [simp,search] lax_monoidal_functor.μ_natural
+attribute [simp] lax_monoidal_functor.μ_natural
 restate_axiom lax_monoidal_functor.left_unitality'
-attribute [simp,search] lax_monoidal_functor.left_unitality
+attribute [simp] lax_monoidal_functor.left_unitality
 restate_axiom lax_monoidal_functor.right_unitality'
-attribute [simp,search] lax_monoidal_functor.right_unitality
+attribute [simp] lax_monoidal_functor.right_unitality
 restate_axiom lax_monoidal_functor.associativity'
-attribute [simp,search] lax_monoidal_functor.associativity
+attribute [simp] lax_monoidal_functor.associativity
+
+-- When `rewrite_search` lands, add @[search] attributes to
+-- lax_monoidal_functor.μ_natural lax_monoidal_functor.left_unitality
+-- lax_monoidal_functor.right_unitality lax_monoidal_functor.associativity
 
 structure monoidal_functor
 extends lax_monoidal_functor.{v₁ v₂ u₁ u₂} C D :=
@@ -118,8 +122,6 @@ variables {D : Sort u₂} [𝒟 : monoidal_category.{v₂} D]
 variables {E : Sort u₃} [ℰ : monoidal_category.{v₃} E]
 
 include 𝒟 ℰ
-
-open tactic.rewrite_search.tracer
 
 section
 variables (F : lax_monoidal_functor.{v₁ v₂ u₁ u₂} C D) (G : lax_monoidal_functor.{v₂ v₃ u₂ u₃} D E)
