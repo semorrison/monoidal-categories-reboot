@@ -25,11 +25,11 @@ class braided_monoidal_category (C : Sort u) extends monoidal_category.{v} C :=
 -- hexagon identities:
 (hexagon_forward'     : Π X Y Z : C,
     (associator X Y Z).hom ≫ (braiding X (Y ⊗ Z)).hom ≫ (associator Y Z X).hom
-  = ((braiding X Y).hom ⊗ (𝟙 Z)) ≫ (associator Y X Z).hom ≫ (𝟙 Y) ⊗ (braiding X Z).hom
+  = ((braiding X Y).hom ⊗ (𝟙 Z)) ≫ (associator Y X Z).hom ≫ ((𝟙 Y) ⊗ (braiding X Z).hom)
   . obviously)
 (hexagon_reverse'     : Π X Y Z : C,
     (associator X Y Z).inv ≫ (braiding (X ⊗ Y) Z).hom ≫ (associator Z X Y).inv
-  = ((𝟙 X) ⊗ (braiding Y Z).hom) ≫ (associator X Z Y).inv ≫ (braiding X Z).hom ⊗ (𝟙 Y)
+  = ((𝟙 X) ⊗ (braiding Y Z).hom) ≫ (associator X Z Y).inv ≫ ((braiding X Z).hom ⊗ (𝟙 Y))
   . obviously)
 
 
@@ -45,7 +45,7 @@ section
 variables (C : Type u) [𝒞 : braided_monoidal_category.{v+1} C]
 include 𝒞
 
--- TODO not good names, should just take about `tensor_functor` and `swap ⋙ tensor_functor`.
+-- TODO not good names, should just talk about `tensor_functor` and `swap ⋙ tensor_functor`.
 @[reducible] def braided_monoidal_category.braiding_functor : (C × C) ⥤ C :=
 { obj := λ X, X.2 ⊗ X.1,
   map := λ {X Y : C × C} (f : X ⟶ Y), f.2 ⊗ f.1 }
@@ -80,8 +80,8 @@ attribute [simp,search] symmetric_monoidal_category.symmetry
 
 open braided_monoidal_category
 
-variables (C : Type u₁) [𝒞 : braided_monoidal_category.{u₁ v₁} C]
-variables (D : Type u₂) [𝒟 : braided_monoidal_category.{u₂ v₂} D]
+variables (C : Sort u₁) [𝒞 : braided_monoidal_category.{v₁} C]
+variables (D : Sort u₂) [𝒟 : braided_monoidal_category.{v₂} D]
 include 𝒞 𝒟
 
 -- FIXME fix ordering of universe levels

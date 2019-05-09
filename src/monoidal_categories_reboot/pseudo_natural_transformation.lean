@@ -1,6 +1,5 @@
 import .monoidal_functor
 import .endofunctors
-import tidy.rewrite_search
 import tactic.interactive
 
 open category_theory
@@ -10,31 +9,12 @@ universes u₁ u₂ u₃ u₄ v₁ v₂ v₃ v₄
 
 open category_theory.category
 
-namespace tactic
-open conv
-private meta def conv_target' (c : conv unit) : tactic unit :=
-do t ← target,
-   (new_t, pr) ← c.convert t,
-   replace_target new_t pr,
-   try tactic.triv, try (tactic.reflexivity reducible)
-
-namespace interactive
-open interactive
-open lean.parser
-
-meta def slice_lhs (a b : parse small_nat) (t : conv.interactive.itactic) : tactic unit :=
-do conv_target' (conv.interactive.to_lhs >> slice a b >> t)
-meta def slice_rhs (a b : parse small_nat) (t : conv.interactive.itactic) : tactic unit :=
-do conv_target' (conv.interactive.to_rhs >> slice a b >> t)
-end interactive
-end tactic
-
 namespace category_theory.monoidal
 
 open monoidal_category
 
-variables {C : Type u₁} [𝒞 : monoidal_category.{u₁ v₁} C]
-          {D : Type u₂} [𝒟 : monoidal_category.{u₂ v₂} D]
+variables {C : Type u₁} [𝒞 : monoidal_category.{v₁+1} C]
+          {D : Type u₂} [𝒟 : monoidal_category.{v₂+1} D]
 variables (F G : monoidal_functor C D)
 
 structure pseudo_natural_transformation :=
@@ -65,7 +45,7 @@ def id : pseudo_natural_transformation F F :=
 variables {F G}
 
 def β_nat_trans (σ : pseudo_natural_transformation F G) :
-  F.to_functor ⋙ (tensor_on_right.obj σ.N) ⟹ G.to_functor ⋙ (tensor_on_left.obj σ.N) :=
+  F.to_functor ⋙ (tensor_on_right.obj σ.N) ⟶ G.to_functor ⋙ (tensor_on_left.obj σ.N) :=
 { app := λ X, σ.β X,
   naturality' := λ X Y f, σ.β_natural f }
 
@@ -98,14 +78,14 @@ def vcomp : pseudo_natural_transformation F H :=
 lemma vcomp_β_nat_trans :
   (σ.vcomp τ).β_nat_trans =
   (by calc
-    F.to_functor ⋙ (tensor_on_right).obj (σ.N ⊗ τ.N) ⟹
+    F.to_functor ⋙ (tensor_on_right).obj (σ.N ⊗ τ.N) ⟶
         F.to_functor ⋙ ((tensor_on_right).obj σ.N) ⋙ ((tensor_on_right).obj τ.N) : whisker_left F.to_functor sorry
-    ... ⟹ (F.to_functor ⋙ (tensor_on_right).obj τ.N) ⋙ ((tensor_on_right).obj σ.N) : sorry
-    ... ⟹ (H.to_functor ⋙ (tensor_on_left).obj (σ.N ⊗ τ.N)) : sorry) :=
+    ... ⟶ (F.to_functor ⋙ (tensor_on_right).obj τ.N) ⋙ ((tensor_on_right).obj σ.N) : sorry
+    ... ⟶ (H.to_functor ⋙ (tensor_on_left).obj (σ.N ⊗ τ.N)) : sorry) :=
 sorry
 end vcomp
 
-variables {E : Type u₃} [ℰ : monoidal_category.{u₃ v₃} E]
+variables {E : Type u₃} [ℰ : monoidal_category.{v₃} E]
 variables {K L : monoidal_functor D E}
 
 attribute [trans] category.comp
@@ -170,8 +150,8 @@ def right_unitor_inv : modification σ (σ.vcomp (pseudo_natural_transformation.
 end vcomp
 
 section
-variables {A : Type u₃} [𝒜 : monoidal_category.{u₃ v₃} A]
-variables {B : Type u₄} [ℬ : monoidal_category.{u₄ v₄} B]
+variables {A : Type u₃} [𝒜 : monoidal_category.{v₃} A]
+variables {B : Type u₄} [ℬ : monoidal_category.{v₄} B]
 variables {K L : monoidal_functor A B}
 variables {M N : monoidal_functor B C}
 
@@ -184,7 +164,7 @@ end
 section exchange
 variables {H : monoidal_functor C D}
 variables (ρ : pseudo_natural_transformation G H)
-variables {E : Type u₃} [ℰ : monoidal_category.{u₃ v₃} E]
+variables {E : Type u₃} [ℰ : monoidal_category.{v₃} E]
 variables {K L M : monoidal_functor D E}
 variables (ν : pseudo_natural_transformation K L)
 variables (κ : pseudo_natural_transformation L M)

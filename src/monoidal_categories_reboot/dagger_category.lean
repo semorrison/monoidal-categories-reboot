@@ -5,7 +5,6 @@ import category_theory.functor
 import category_theory.products
 import category_theory.natural_isomorphism
 import category_theory.tactics.obviously -- Give ourselves access to `rewrite_search`
-import .slice_tactic
 import .braided_monoidal_category
 import .rigid_monoidal_category
 

@@ -8,34 +8,23 @@ open category_theory
 
 namespace category_theory.is_iso
 
-variables {C : Type u₁} [𝒞 : category.{u₁ v₁} C]
-variables {D : Type u₂} [𝒟 : category.{u₂ v₂} D]
+variables {C : Sort u₁} [𝒞 : category.{v₁} C]
+variables {D : Sort u₂} [𝒟 : category.{v₂} D]
 include 𝒞 𝒟
 
 variables {F G : C ⥤ D}
 
-instance is_iso_of_is_iso_app (α : Π X : C, F.obj X ⟶ G.obj X) [∀ X : C, is_iso (α X)] (nat) : 
+instance is_iso_of_is_iso_app (α : Π X : C, F.obj X ⟶ G.obj X) [∀ X : C, is_iso (α X)] (nat) :
   @is_iso (C ⥤ D) (category_theory.functor.category C D) F G { app := λ X, α X, naturality' := nat } :=
-begin
-  sorry
-end
+{ ..(nat_iso.of_components (λ X, as_iso (α X)) @nat) }
 
 end category_theory.is_iso
-
-namespace category_theory
-variables {C : Type u₁} [𝒞 : category.{u₁ v₁} C]
-include 𝒞
-
-def iso.infer {X Y : C} (f : X ⟶ Y) [is_iso f] : X ≅ Y :=
-{ hom := f,
-  inv := category_theory.inv f }
-end category_theory
 
 open category_theory
 
 namespace category_theory.monoidal
 
-variables {C : Type u} [𝒞 : monoidal_category.{u v} C]
+variables {C : Sort u} [𝒞 : monoidal_category.{v} C]
 include 𝒞
 
 
@@ -87,7 +76,7 @@ def id (P : Z.{u v} C) : Z_hom P P :=
 def comp {P Q R : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom Q R) : Z_hom P R :=
 { hom := f.hom ≫ g.hom }
 
-@[simp] lemma comp_hom {P Q R : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom Q R) : 
+@[simp] lemma comp_hom {P Q R : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom Q R) :
   (comp f g).hom = f.hom ≫ g.hom := rfl
 end Z_hom
 
@@ -97,13 +86,13 @@ instance drinfeld_centre_category : category.{(max u v) v} (Z.{u v} C) :=
   comp := λ P Q R f g, Z_hom.comp f g }.
 
 @[simp] lemma drinfeld_id_hom (P : Z.{u v} C) : (𝟙 P : Z_hom P P).hom = 𝟙 P.X := rfl
-@[simp] lemma drinfeld_comp_hom {P Q R : Z.{u v} C} (f : P ⟶ Q) (g : Q ⟶ R) : 
+@[simp] lemma drinfeld_comp_hom {P Q R : Z.{u v} C} (f : P ⟶ Q) (g : Q ⟶ R) :
   (f ≫ g).hom = f.hom ≫ g.hom := rfl
 
 -- TODO derive this from the faithful functor Z C ⥤ C
 instance Z_iso {P Q : Z.{u v} C} (f : P ⟶ Q) [is_iso f.hom] : is_iso f := sorry
 
-def Z_tensor_unit : Z.{u v} C := 
+def Z_tensor_unit : Z.{u v} C :=
 { X := tensor_unit C,
   β := iso.infer
   { app := λ Y, (left_unitor Y).hom ≫ (right_unitor Y).inv } }.
@@ -112,24 +101,24 @@ set_option class.instance_max_depth 200
 
 def Z_tensor_obj (P Q : Z.{u v} C) : Z.{u v} C :=
 { X := P.X ⊗ Q.X,
-  β := 
+  β :=
   iso.infer
   { app := λ Y, (associator _ _ _).hom ≫ (𝟙 _ ⊗ (Q.β.hom.app Y)) ≫ (associator _ _ _).inv ≫ ((P.β.hom.app Y) ⊗ 𝟙 _) ≫ (associator _ _ _).hom,
     naturality' := begin tidy, sorry end
   }
   }
 
-@[simp] lemma Z_tensor_obj_β_hom_app (P Q : Z.{u v} C) (Y : C) : 
-  (Z_tensor_obj P Q).β.hom.app Y = 
+@[simp] lemma Z_tensor_obj_β_hom_app (P Q : Z.{u v} C) (Y : C) :
+  (Z_tensor_obj P Q).β.hom.app Y =
   (associator _ _ _).hom ≫ (𝟙 _ ⊗ (Q.β.hom.app Y)) ≫ (associator _ _ _).inv ≫ ((P.β.hom.app Y) ⊗ 𝟙 _) ≫ (associator _ _ _).hom :=
 rfl
 
-def Z_tensor_hom {P Q R S : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom R S) : 
+def Z_tensor_hom {P Q R S : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom R S) :
   Z_hom (Z_tensor_obj P R) (Z_tensor_obj Q S) :=
 { hom := f.hom ⊗ g.hom,
   w' := begin tidy, sorry end }.
 
-@[simp] lemma Z_tensor_hom_hom {P Q R S : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom R S) : 
+@[simp] lemma Z_tensor_hom_hom {P Q R S : Z.{u v} C} (f : Z_hom P Q) (g : Z_hom R S) :
   (Z_tensor_hom f g).hom = f.hom ⊗ g.hom := rfl
 
 def Z_left_unitor (P : Z.{u v} C) : Z_tensor_obj Z_tensor_unit P ≅ P :=
@@ -138,7 +127,7 @@ iso.infer { hom := (left_unitor P.X).hom, w' := sorry /- works, but too slow -/ 
 def Z_right_unitor (P : Z.{u v} C) : Z_tensor_obj P Z_tensor_unit ≅ P :=
 iso.infer { hom := (right_unitor P.X).hom, w' := sorry /- works, but too slow -/ }.
 
-def Z_associator (P Q R : Z.{u v} C) : 
+def Z_associator (P Q R : Z.{u v} C) :
   Z_tensor_obj (Z_tensor_obj P Q) R ≅ Z_tensor_obj P (Z_tensor_obj Q R) :=
 iso.infer
 { hom := (associator P.X Q.X R.X).hom,

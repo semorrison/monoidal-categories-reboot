@@ -3,12 +3,10 @@ import .monoidal_category
 import .braided_monoidal_category
 import tactic.rewrite_search
 import .monoidal_functor
-import .slice_tactic
 
 open tactic.rewrite_search.metric
 open tactic.rewrite_search.strategy
 open tactic.rewrite_search.tracer
-open category_theory.slice
 
 universes v u
 
