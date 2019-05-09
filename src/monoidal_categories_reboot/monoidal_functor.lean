@@ -141,92 +141,81 @@ include 𝒟 ℰ
 open tactic.rewrite_search.tracer
 -- set_option profiler true
 
-def monoidal_functor.comp
-  (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) (G : monoidal_functor.{v₂ v₃ u₂ u₃} D E) : monoidal_functor.{v₁ v₃ u₁ u₃} C E :=
+section
+variables (F : lax_monoidal_functor.{v₁ v₂ u₁ u₂} C D) (G : lax_monoidal_functor.{v₂ v₃ u₂ u₃} D E)
+
+def lax_monoidal_functor.comp : lax_monoidal_functor.{v₁ v₃ u₁ u₃} C E :=
 { ε                := G.ε ≫ (G.map F.ε),
   μ                := λ X Y, G.μ (F.obj X) (F.obj Y) ≫ G.map (F.μ X Y),
-  ε_is_iso         := by apply_instance, -- TODO tidy should get this
-  μ_is_iso         := by apply_instance, -- TODO tidy should get this
-  μ_natural'       :=
+  μ_natural'       := λ _ _ _ _ f g,
   begin
-    tidy,
+    simp only [functor.comp_map, assoc],
     /- `rewrite_search` says -/
-    conv_lhs { erw [←category.assoc] },
-    conv_lhs { congr, erw [lax_monoidal_functor.μ_natural] },
-    conv_lhs { erw [category.assoc] },
-    conv_lhs { congr, skip, erw [←map_comp] },
-    conv_rhs { congr, skip, erw [←map_comp] },
-    conv_rhs { congr, skip, erw [←lax_monoidal_functor.μ_natural] }
+    conv_lhs { rw [←category.assoc], congr, rw [lax_monoidal_functor.μ_natural] },
+    conv_lhs { rw [category.assoc], congr, skip, rw [←map_comp] },
+    conv_rhs { congr, skip, rw [←map_comp, ←lax_monoidal_functor.μ_natural] }
   end,
   associativity'   := λ X Y Z,
   begin
-    -- obviously fails here, but it seems like it should be doable!
     dsimp,
-    conv { to_rhs,
-      rw interchange_right_identity,
-      slice 3 4,
-      rw ← G.to_functor.map_id,
-      rw G.to_lax_monoidal_functor.μ_natural,
-    },
-    -- rewrite_search { view := visualiser, trace_summary := tt, explain := tt, max_iterations := 50 }, -- fails
-    conv { to_rhs,
-      slice 1 3,
-      rw ←G.to_lax_monoidal_functor.associativity,
-    },
-    -- rewrite_search (saw/visited/used) 137/23/16 expressions during proof of category_theory.monoidal.monoidal_functor.comp
-    conv { to_lhs,
-      rw interchange_left_identity,
-      slice 2 3,
-      rw ← G.to_functor.map_id,
-      rw G.to_lax_monoidal_functor.μ_natural, },
-    repeat { rw category.assoc },
-    repeat { rw ←G.to_functor.map_comp },
-    rw F.to_lax_monoidal_functor.associativity,
+    rw interchange_right_identity,
+    slice_rhs 3 4 { rw [← G.to_functor.map_id, G.μ_natural], },
+    slice_rhs 1 3 { rw ←G.associativity, },
+    rw interchange_left_identity,
+    slice_lhs 2 3 { rw [← G.to_functor.map_id, G.μ_natural], },
+    rw [category.assoc, category.assoc, category.assoc, category.assoc, category.assoc,
+        ←G.to_functor.map_comp, ←G.to_functor.map_comp, ←G.to_functor.map_comp, ←G.to_functor.map_comp,
+        F.associativity],
   end,
   left_unitality'  := λ X,
   begin
-    -- Don't attempt to read this; it is a Frankenstein effort of Scott + rewrite_search
     dsimp,
-    rw G.to_lax_monoidal_functor.left_unitality,
-    rw interchange_left_identity,
-    repeat {rw category.assoc},
+    rw [G.left_unitality, interchange_left_identity, category.assoc, category.assoc],
     apply congr_arg,
-    /- `rewrite_search` says -/
-    rw F.to_lax_monoidal_functor.left_unitality,
-    conv_lhs { congr, skip, erw [map_comp] },
-    conv_lhs { erw [←category.id_app] },
-    conv_lhs { erw [←category.assoc] },
-    conv_lhs { congr, erw [←lax_monoidal_functor.μ_natural] },
-    conv_lhs { congr, congr, congr, skip, erw [map_id] },
-    conv_rhs { erw [←category.assoc] },
-    erw map_comp,
+    rw F.left_unitality,
+    conv_lhs { congr, skip, rw [map_comp] },
+    conv_lhs { rw [←category.id_app, ←category.assoc] },
+    conv_lhs { congr, rw [←lax_monoidal_functor.μ_natural] },
+    conv_lhs { congr, congr, congr, skip, rw [functor.category.id_app, map_id] },
+    conv_rhs { rw [←category.assoc] },
+    rw map_comp,
   end,
   right_unitality' := λ X,
   begin
     dsimp,
-    rw G.to_lax_monoidal_functor.right_unitality,
-    rw interchange_right_identity,
-    repeat {rw category.assoc},
+    rw [G.right_unitality, interchange_right_identity, category.assoc, category.assoc],
     apply congr_arg,
-    /- `rewrite_search` says -/
-    rw F.to_lax_monoidal_functor.right_unitality,
-    conv_lhs { congr, skip, erw [map_comp] },
-    conv_lhs { erw [←category.id_app] },
-    conv_lhs { erw [←category.assoc] },
-    conv_lhs { congr, erw [←lax_monoidal_functor.μ_natural] },
-    conv_lhs { congr, congr, congr, erw [map_id] },
-    conv_rhs { erw [←category.assoc] },
-    erw map_comp,
+    rw F.right_unitality,
+    conv_lhs { congr, skip, rw [map_comp] },
+    conv_lhs { rw [←category.id_app, ←category.assoc] },
+    conv_lhs { congr, rw [←lax_monoidal_functor.μ_natural] },
+    conv_lhs { congr, congr, congr, rw [functor.category.id_app, map_id] },
+    conv_rhs { rw [←category.assoc] },
+    rw map_comp,
   end,
   .. (F.to_functor) ⋙ (G.to_functor) }.
 
+@[simp] lemma lax_monoidal_functor.comp_obj (X : C) : (F.comp G).obj X = G.obj (F.obj X) := rfl
+@[simp] lemma lax_monoidal_functor.comp_ε : (F.comp G).ε = G.ε ≫ (G.map F.ε) := rfl
+@[simp] lemma lax_monoidal_functor.comp_μ (X Y : C) : (F.comp G).μ X Y = G.μ (F.obj X) (F.obj Y) ≫ G.map (F.μ X Y) := rfl
+end
+
+section
 variables (F : monoidal_functor.{v₁ v₂ u₁ u₂} C D) (G : monoidal_functor.{v₂ v₃ u₂ u₃} D E)
 
-@[simp] lemma comp_obj (X : C) : (F.comp G).obj X = G.obj (F.obj X) := rfl
-@[simp] lemma comp_map {X X' : C} (f : X ⟶ X') :
-  begin let h := (F.comp G).map f, dsimp at h, exact h end = G.map (F.map f) :=
-rfl
+def monoidal_functor.comp : monoidal_functor.{v₁ v₃ u₁ u₃} C E :=
+{ ε_is_iso         := by { dsimp, apply_instance }, -- TODO tidy should get this
+  μ_is_iso         := by { dsimp, apply_instance }, -- TODO tidy should get this
+  .. (F.to_lax_monoidal_functor).comp (G.to_lax_monoidal_functor) }.
 
+@[simp] lemma monoidal_functor.comp_obj (X : C) : (F.comp G).obj X = G.obj (F.obj X) := rfl
+-- FIXME why doesn't this work?
+-- @[simp] lemma comp_map {X X' : C} (f : X ⟶ X') :
+--   ((((F.comp G) : monoidal_functor.{v₁ v₃ u₁ u₃} C E).map f) : G.obj (F.obj X) ⟶ G.obj (F.obj X')) =
+--    (G.map (F.map f) : G.obj (F.obj X) ⟶ G.obj (F.obj X')) :=
+-- rfl
+
+end
 end
 
 end category_theory.monoidal
