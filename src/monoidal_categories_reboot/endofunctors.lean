@@ -1,5 +1,4 @@
 -- Copyright (c) 2018 Scott Morrison. All rights reserved.
-import .monoidal_functor
 import .monoidal_functor_attributes
 import .monoidal_opposite
 import tactic.squeeze
@@ -26,20 +25,19 @@ instance monoidal_category_of_endofunctors : monoidal_category (C ⥤ C) :=
   right_unitor := λ F, functor.right_unitor F }.
 
 namespace endofunctors
-open monoidal_category
 
 @[simp] lemma tensor_endofunctors (F G : C ⥤ C) : F ⊗ G = F ⋙ G := rfl
-@[simp] lemma unit_endofunctor : tensor_unit (C ⥤ C) = functor.id C := rfl
+@[simp] lemma unit_endofunctor : 𝟙_ (C ⥤ C) = functor.id C := rfl
 @[simp] lemma tensor_endotransformations {F G H K : C ⥤ C} (α : F ⟶ G) (β : H ⟶ K) : α ⊗ β = (α ◫ β) :=
 rfl
 
 variables (F G H : C ⥤ C)
-@[simp] lemma associator_hom : (associator F G H).hom = 𝟙 _ := rfl
-@[simp] lemma associator_inv : (associator F G H).inv = 𝟙 _ := rfl
-@[simp] lemma left_unitor_hom_app (X : C) : nat_trans.app (monoidal_category.left_unitor F).hom X = 𝟙 _ := rfl
-@[simp] lemma left_unitor_inv_app (X : C) : nat_trans.app (monoidal_category.left_unitor F).inv X = 𝟙 _ := rfl
-@[simp] lemma right_unitor_hom_app (X : C) : nat_trans.app (monoidal_category.right_unitor F).hom X = 𝟙 _ := rfl
-@[simp] lemma right_unitor_inv_app (X : C) : nat_trans.app (monoidal_category.right_unitor F).inv X = 𝟙 _ := rfl
+@[simp] lemma associator_hom : (α_ F G H).hom = 𝟙 _ := rfl
+@[simp] lemma associator_inv : (α_ F G H).inv = 𝟙 _ := rfl
+@[simp] lemma left_unitor_hom_app (X : C) : nat_trans.app (λ_ F).hom X = 𝟙 _ := rfl
+@[simp] lemma left_unitor_inv_app (X : C) : nat_trans.app (λ_ F).inv X = 𝟙 _ := rfl
+@[simp] lemma right_unitor_hom_app (X : C) : nat_trans.app (ρ_ F).hom X = 𝟙 _ := rfl
+@[simp] lemma right_unitor_inv_app (X : C) : nat_trans.app (ρ_ F).inv X = 𝟙 _ := rfl
 
 end endofunctors
 end category_theory.monoidal

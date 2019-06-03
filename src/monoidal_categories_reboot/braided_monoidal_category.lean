@@ -1,4 +1,3 @@
-import .monoidal_functor
 import .monoidal_functor_attributes
 open category_theory
 open tactic
@@ -8,10 +7,9 @@ universes v u v₁ u₁ v₂ u₂
 open category_theory.category
 open category_theory.functor
 open category_theory.prod
-open category_theory.functor.category.nat_trans
 open category_theory.nat_iso
 
-namespace category_theory.monoidal
+namespace category_theory
 
 class braided_monoidal_category (C : Sort u) extends monoidal_category.{v} C :=
 -- braiding natural iso:
@@ -41,14 +39,6 @@ section
 variables (C : Type u) [𝒞 : braided_monoidal_category.{v+1} C]
 include 𝒞
 
--- TODO not good names, should just talk about `tensor_functor` and `swap ⋙ tensor_functor`.
-@[reducible] def braided_monoidal_category.braiding_functor : (C × C) ⥤ C :=
-{ obj := λ X, X.2 ⊗ X.1,
-  map := λ {X Y : C × C} (f : X ⟶ Y), f.2 ⊗ f.1 }
-@[reducible] def braided_monoidal_category.non_braiding_functor : (C × C) ⥤ C :=
-{ obj := λ X, X.1 ⊗ X.2,
-  map := λ {X Y : C × C} (f : X ⟶ Y), f.1 ⊗ f.2 }
-
 open monoidal_category
 open braided_monoidal_category
 open monoidal_category
@@ -57,14 +47,8 @@ open monoidal_category
   (braiding (X ⊗ Y) Z).hom =
   (associator X Y Z).hom ≫ ((𝟙 X) ⊗ (braiding Y Z).hom) ≫ (associator X Z Y).inv ≫ ((braiding X Z).hom ⊗ (𝟙 Y)) ≫ (associator Z X Y).hom :=
 begin
-  obviously,
+  sorry
 end
-
--- FIXME `category_theory/products/default.lean` is missing lots of simp lemmas.
-def braided_monoidal_category.braiding_nat_iso : swap C C ⋙ braiding_functor C ≅ tensor C :=
-nat_iso.of_components
-  (by intros; dsimp; apply braiding)
-  (by intros; apply braiding_naturality)
 
 end
 
@@ -77,12 +61,12 @@ attribute [simp,search] symmetric_monoidal_category.symmetry
 
 open braided_monoidal_category
 
-variables (C : Sort u₁) [𝒞 : braided_monoidal_category.{v₁} C]
-variables (D : Sort u₂) [𝒟 : braided_monoidal_category.{v₂} D]
+variables (C : Type u₁) [𝒞 : braided_monoidal_category.{v₁} C]
+variables (D : Type u₂) [𝒟 : braided_monoidal_category.{v₂} D]
 include 𝒞 𝒟
 
 -- FIXME add tensorators
 -- structure braided_functor extends F : monoidal_functor.{v₁ v₂} C D :=
 -- (w' := Π X Y : C, F.to_functor.map_iso (braiding X Y) = braiding (F.obj X) (F.obj Y))
 
-end category_theory.monoidal
+end category_theory

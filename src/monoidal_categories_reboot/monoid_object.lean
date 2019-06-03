@@ -10,7 +10,7 @@ open tactic.rewrite_search.tracer
 
 universes v u
 
-namespace category_theory.monoidal
+namespace category_theory
 
 open monoidal_category
 class monoid_object {C : Sort u} (M : C) [monoidal_category.{v} C] :=
@@ -33,7 +33,7 @@ open braided_monoidal_category
 open monoid_object
 
 @[reducible]
-def reassociate_and_braid_product {C : Sort u} (X Y : C) [symmetric_monoidal_category.{v} C] :=
+def reassociate_and_braid_product {C : Sort u} (X Y : C) [braided_monoidal_category.{v} C] :=
 (associator X Y (X ⊗ Y)).hom ≫ ((𝟙 X) ⊗ (associator Y X Y).inv) ≫
 ((𝟙 X) ⊗ (braiding Y X).hom ⊗ (𝟙 Y)) ≫ ((𝟙 X) ⊗ (associator X Y Y).hom) ≫
 (associator X X (Y ⊗ Y)).inv
@@ -43,7 +43,7 @@ def reassociate_and_braid_product {C : Sort u} (X Y : C) [symmetric_monoidal_cat
 -- This is trivial on paper via string diagrams.
 -- Would it be possible to write a string diagram tactic?
 instance product_monoid_object_of_monoid_object
-    {C : Sort u} (M N : C) [symmetric_monoidal_category.{v} C]
+    {C : Sort u} (M N : C) [braided_monoidal_category.{v} C]
     [ℳ : monoid_object.{v} M] [𝒩 : monoid_object.{v} N] :
     monoid_object (M ⊗ N) :=
 { unit        := (left_unitor (tensor_unit C)).inv ≫ (ℳ.unit ⊗ 𝒩.unit),
@@ -123,7 +123,7 @@ class bimonoid_object
                       ((𝟙 M) ⊗ (associator M M M).hom) ≫ (associator M M (M ⊗ M)).inv ≫
                       (product ⊗ product))
 (product_counit'    : product ≫ counit = (counit ⊗ counit) ≫ (left_unitor (tensor_unit C)).hom)
-(unit_coproduct'    : unit ≫ coproduct = (left_unitor (tensor_unit C)).inv ≫ unit ⊗ unit)
+(unit_coproduct'    : unit ≫ coproduct = (left_unitor (tensor_unit C)).inv ≫ (unit ⊗ unit))
 (unit_counit'       : unit ≫ counit = 𝟙 (tensor_unit C))
 
 restate_axiom bimonoid_object.product_coproduct'
@@ -194,4 +194,4 @@ structure special_commutative_frobenius_object
 (special     : is_special M)
 (commutative : is_commutative_frobenius M)
 
-end category_theory.monoidal
+end category_theory

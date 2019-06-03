@@ -3,14 +3,13 @@ import category_theory.category
 import category_theory.functor
 import category_theory.products
 import category_theory.natural_isomorphism
-import ..monoidal_category
 import ..braided_monoidal_category
 open category_theory
 open tactic
 
 universes u v
 
-namespace category_theory.monoidal
+namespace category_theory
 
 section
 
@@ -29,7 +28,7 @@ def types_braiding (α β : Type u) : α × β → β × α :=
 λ X, ⟨X.2, X.1⟩
 def types_braiding_inv := types_braiding
 
-instance types : symmetric_monoidal_category.{(u+1)} (Type u) :=
+instance symmetric_category_of_types : symmetric_monoidal_category.{(u+1)} (Type u) :=
 { tensor_obj := λ X Y, X × Y,
   tensor_hom := λ _ _ _ _ f g, prod.map f g,
   tensor_unit := punit,
@@ -48,4 +47,4 @@ instance types : symmetric_monoidal_category.{(u+1)} (Type u) :=
 
 end
 
-end category_theory.monoidal
+end category_theory

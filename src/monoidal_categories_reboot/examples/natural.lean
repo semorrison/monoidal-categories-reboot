@@ -4,20 +4,19 @@ import category_theory.category
 import category_theory.functor
 import category_theory.products
 import category_theory.natural_isomorphism
-import ..monoidal_category
 import ..monoid_object
 open category_theory
 open tactic
 
 universes u v
 
-namespace category_theory.monoidal
+namespace category_theory
 
 section
 
 open monoidal_category
 
-inductive nat_hom (m n : ℕ) : Type 
+inductive nat_hom (m n : ℕ) : Type
 | mk : nat_hom
 
 @[simp] lemma equality {m n : ℕ} (f : nat_hom m n) : f = nat_hom.mk m n :=
@@ -64,4 +63,4 @@ instance nat_comonoid_object (n : nat) : comonoid_object n :=
 
 instance nat_frobenius_object (n : nat) : frobenius_object n := {}
 
-end category_theory.monoidal
+end category_theory
