@@ -21,8 +21,7 @@ right_unitor_inv_naturality
 lax_monoidal_functor.μ_natural lax_monoidal_functor.left_unitality
 lax_monoidal_functor.right_unitality lax_monoidal_functor.associativity
 
--- FIXME I need to put `explain := tt` back in here.
-meta def rws : tactic string := tactic.rewrite_search {} >> pure ""
+meta def rws : tactic string := `[rewrite_search {explain := tt}] >> pure ""
 @[obviously] meta def obviously'' := tactic.tidy {tactics := tactic.tidy.default_tactics ++ [rws]}
 
 
@@ -41,10 +40,3 @@ by obviously
 
 @[search] lemma left_unitor_naturality' {X Y : C} (f : X ⟶ Y) : (λ_ X).inv ≫ ((𝟙 (𝟙_ C)) ⊗ f) ≫ (λ_ Y).hom = f :=
 by obviously
-
-@[search] lemma right_unitor_naturality'' {X Y : C} (f : X ⟶ Y) : (ρ_ X).inv ≫ (f ⊗ (𝟙 (𝟙_ C))) = f ≫ (ρ_ Y).inv :=
-by obviously
-
-@[search] lemma left_unitor_naturality'' {X Y : C} (f : X ⟶ Y) : (λ_ X).inv ≫ ((𝟙 (𝟙_ C)) ⊗ f) = f ≫ (λ_ Y).inv :=
-by obviously
-

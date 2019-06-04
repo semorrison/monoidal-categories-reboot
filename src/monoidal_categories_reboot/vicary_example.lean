@@ -15,48 +15,40 @@ begin
   obviously,
 end
 
-lemma vicary1 : (λ_ (𝟙_ C)).hom ≫ (λ_ (𝟙_ C)).inv = 𝟙 _ :=
-begin
-  obviously,
-end
-
-lemma vicary2 : (λ_ (𝟙_ C ⊗ 𝟙_ C)).inv ≫ ((𝟙 (𝟙_ C)) ⊗ (ρ_ _).hom) = (ρ_ (𝟙_ C)).hom ≫ (λ_ (𝟙_ C)).inv :=
+@[search] lemma vicary_1_2 : (ρ_ (𝟙_ C)).hom = (λ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ≫ ((𝟙 (𝟙_ C)) ⊗ (ρ_ (𝟙_ C)).hom) ≫ (λ_ (𝟙_ C)).hom :=
 by obviously
 
-@[search] lemma vicary12 : (ρ_ (𝟙_ C)).hom = (λ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ≫ ((𝟙 (𝟙_ C)) ⊗ (ρ_ (𝟙_ C)).hom) ≫ (λ_ (𝟙_ C)).hom :=
-by obviously
-
-lemma vicary4 :
+lemma vicary_4 :
 (λ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ≫ ((𝟙 (𝟙_ C)) ⊗ ((λ_ (𝟙_ C)).hom)) = (λ_ (𝟙_ C)).hom ≫ (λ_ (𝟙_ C)).inv :=
 by obviously
 
-lemma vicary4' :
+lemma vicary_4' :
 (λ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv = (λ_ (𝟙_ C)).hom ≫ (λ_ (𝟙_ C)).inv ≫ ((𝟙 (𝟙_ C)) ⊗ ((λ_ (𝟙_ C)).inv)) :=
-by rw [←assoc, ←vicary4, assoc, ←id_tensor_comp, iso.hom_inv_id, tensor_id, comp_id]
+by rw [←assoc, ←vicary_4, assoc, ←id_tensor_comp, iso.hom_inv_id, tensor_id, comp_id]
 
-@[search] lemma vicary34 :
+@[search] lemma vicary_3_4 :
 (λ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv = (𝟙 (𝟙_ C)) ⊗ ((λ_ (𝟙_ C)).inv) :=
-by rw [vicary4', ←assoc, iso.hom_inv_id, id_comp]
+by rw [vicary_4', ←assoc, iso.hom_inv_id, id_comp]
 
-@[search] lemma vicary1234 :
+@[search] lemma vicary_1_4 :
 (ρ_ (𝟙_ C)).hom  = ((𝟙 (𝟙_ C)) ⊗ ((λ_ (𝟙_ C)).inv))  ≫ ((𝟙 (𝟙_ C)) ⊗ (ρ_ (𝟙_ C)).hom) ≫ (λ_ (𝟙_ C)).hom :=
 by obviously
 
-lemma vicary6 :
+lemma vicary_6 :
 ((ρ_ (𝟙_ C)).inv ⊗ (𝟙 (𝟙_ C))) ≫ (ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).hom = (ρ_ (𝟙_ C)).hom ≫ (ρ_ (𝟙_ C)).inv :=
 by obviously
 
-lemma vicary6' :
+lemma vicary_6' :
 ((ρ_ (𝟙_ C)).inv ⊗ (𝟙 (𝟙_ C))) = (ρ_ (𝟙_ C)).hom ≫ (ρ_ (𝟙_ C)).inv ≫ (ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv :=
-by {rw [←assoc, ←vicary6, assoc, iso.hom_inv_id, comp_id], }
+by {rw [←assoc, ←vicary_6, assoc, iso.hom_inv_id, comp_id], }
 
-@[search] lemma vicary56 : ((ρ_ (𝟙_ C)).inv ⊗ (𝟙 (𝟙_ C))) = (ρ_ (𝟙_ C ⊗ 𝟙_ C)).inv :=
-by rw [vicary6', ←assoc, iso.hom_inv_id, id_comp]
+@[search] lemma vicary_5_6 : ((ρ_ (𝟙_ C)).inv ⊗ (𝟙 (𝟙_ C))) = (ρ_ (𝟙_ C ⊗ 𝟙_ C)).inv :=
+by rw [vicary_6', ←assoc, iso.hom_inv_id, id_comp]
 
-@[search] lemma vicary7 : ((𝟙 (𝟙_ C)) ⊗ ((λ_ (𝟙_ C)).inv)) = ((ρ_ (𝟙_ C)).inv ⊗ (𝟙 (𝟙_ C))) ≫ (α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).hom :=
+@[search] lemma vicary_7 : ((𝟙 (𝟙_ C)) ⊗ ((λ_ (𝟙_ C)).inv)) = ((ρ_ (𝟙_ C)).inv ⊗ (𝟙 (𝟙_ C))) ≫ (α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).hom :=
 by obviously
 
-@[search] lemma vicary1234567 :
+@[search] lemma vicary_1_7 :
 (ρ_ (𝟙_ C)).hom = (ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ≫ (α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).hom ≫ ((𝟙 (𝟙_ C)) ⊗ (ρ_ (𝟙_ C)).hom) ≫ (λ_ (𝟙_ C)).hom :=
 by obviously.
 
@@ -64,12 +56,11 @@ by obviously.
 by obviously.
 
 @[search] lemma vicary_14 : (ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ≫ (ρ_ (((𝟙_ C) ⊗ (𝟙_ C)) ⊗ (𝟙_ C))).inv = (ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ≫ ((ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ⊗ (𝟙 (𝟙_ C))) :=
-by rw [right_unitor_naturality'']
+by rw [right_unitor_inv_naturality]
 
-lemma vicary_9 : ((α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).hom ⊗ 𝟙 (𝟙_ C)) = (α_ ((𝟙_ C) ⊗ (𝟙_ C)) (𝟙_ C) (𝟙_ C)).hom ≫ (α_ (𝟙_ C) (𝟙_ C) ((𝟙_ C) ⊗ (𝟙_ C))).hom ≫ ((𝟙 (𝟙_ C)) ⊗ (α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).inv) ≫ (α_ (𝟙_ C) ((𝟙_ C) ⊗ (𝟙_ C)) (𝟙_ C)).inv  :=
+@[search] lemma vicary_9 : ((α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).hom ⊗ 𝟙 (𝟙_ C)) = (α_ ((𝟙_ C) ⊗ (𝟙_ C)) (𝟙_ C) (𝟙_ C)).hom ≫ (α_ (𝟙_ C) (𝟙_ C) ((𝟙_ C) ⊗ (𝟙_ C))).hom ≫ ((𝟙 (𝟙_ C)) ⊗ (α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).inv) ≫ (α_ (𝟙_ C) ((𝟙_ C) ⊗ (𝟙_ C)) (𝟙_ C)).inv  :=
 begin
-  have := monoidal_category.pentagon C (𝟙_ C) (𝟙_ C) (𝟙_ C) (𝟙_ C),
-  slice_rhs 1 2 { rw ←this },
+  slice_rhs 1 2 { rw ←(monoidal_category.pentagon C (𝟙_ C) (𝟙_ C) (𝟙_ C) (𝟙_ C)) },
   slice_rhs 3 4 { rw [←id_tensor_comp, iso.hom_inv_id], },
   simp,
 end
@@ -84,21 +75,18 @@ begin
 end
 
 @[search] lemma vicary_9_13 : ((ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ⊗ (𝟙 (𝟙_ C))) ≫ ((α_ (𝟙_ C) (𝟙_ C) (𝟙_ C)).hom ⊗ 𝟙 (𝟙_ C)) = ((𝟙 (𝟙_ C)) ⊗ (ρ_ (𝟙_ C)).inv) ⊗ (𝟙 (𝟙_ C)) :=
-begin
-  rw vicary_9,
-  rw vicary_10_13,
-end
+by obviously
 
 @[search] lemma vicary_15 : (ρ_ ((𝟙_ C) ⊗ (𝟙_ C))).inv ≫ (((𝟙 (𝟙_ C)) ⊗ (ρ_ (𝟙_ C)).inv) ⊗ (𝟙 (𝟙_ C))) ≫ (ρ_ ((𝟙_ C) ⊗ ((𝟙_ C) ⊗ (𝟙_ C)))).hom ≫ ((𝟙 (𝟙_ C)) ⊗ (ρ_ (𝟙_ C)).hom) = 𝟙 _ :=
 begin
-  slice_lhs 1 2 { rw [right_unitor_naturality''] },
+  slice_lhs 1 2 { rw [←right_unitor_inv_naturality] },
   slice_lhs 2 3 { rw [iso.inv_hom_id] },
   obviously
 end
 
 lemma vicary' : (ρ_ (𝟙_ C)).hom = (λ_ (𝟙_ C)).hom :=
 begin
-  rw vicary1234567,
+  rw vicary_1_7,
   rw vicary_8,
   slice_lhs 1 2 { rw vicary_14 },
   slice_lhs 2 3 { rw vicary_9_13 },

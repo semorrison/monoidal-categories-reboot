@@ -5,6 +5,6 @@ lean_version = "3.4.2"
 path = "src"
 
 [dependencies]
-lean-rewrite-search = {git = "https://github.com/semorrison/lean-rewrite-search", branch = "master", rev = "5fada7d709afc39c9745f8ae5ed23f0cd27a5829"}
-lean-category-theory = {git = "https://github.com/semorrison/lean-category-theory", branch = "master", rev = "f187e3aebc6bd67926ad98242666fe95d5e21b76"}
-mathlib = {git = "https://github.com/leanprover-community/mathlib", branch = "rewrite_all", rev = "3ead8e3acce2a4a83a055b1cfa3cd81d96d805cd"}
+lean-rewrite-search = {git = "https://github.com/semorrison/lean-rewrite-search", branch = "old-working-version", rev = "4221c65ed7cc2d96cb9fd7278b9f8746a8843aac"}
+lean-category-theory = {git = "https://github.com/semorrison/lean-category-theory", branch = "master", rev = "0151052845e1f5bc61fc409b6418598d3ff37280"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "4263b2be91c453051aa5790d10fb454a9785fe35"}
