@@ -12,7 +12,7 @@ universes v u
 
 namespace category_theory.dagger
 open category_theory
-open category_theory.monoidal
+open opposite
 
 class dagger_structure
     (C : Sort u) [𝒞 : category.{v} C] :=
@@ -41,8 +41,9 @@ def is_unitary
     {X Y : C} (f : X ≅ Y) : Prop :=
 f.inv = f.hom†
 
-open category_theory.monoidal.monoidal_category
-open category_theory.monoidal.braided_monoidal_category
+open category_theory.monoidal_category
+open category_theory.braided_monoidal_category
+
 class monoidal_dagger_structure
     (C : Sort u) [symmetric_monoidal_category.{v} C]
     extends dagger_structure.{v} C :=

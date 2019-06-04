@@ -30,3 +30,21 @@ notation `𝟙_` := tensor_unit
 notation `α_` := associator
 notation `λ_` := left_unitor
 notation `ρ_` := right_unitor
+
+universes v u
+
+variables {C : Sort u} [𝒞 : monoidal_category.{v} C]
+include 𝒞
+
+@[search] lemma right_unitor_naturality' {X Y : C} (f : X ⟶ Y) : (ρ_ X).inv ≫ (f ⊗ (𝟙 (𝟙_ C))) ≫ (ρ_ Y).hom = f :=
+by obviously
+
+@[search] lemma left_unitor_naturality' {X Y : C} (f : X ⟶ Y) : (λ_ X).inv ≫ ((𝟙 (𝟙_ C)) ⊗ f) ≫ (λ_ Y).hom = f :=
+by obviously
+
+@[search] lemma right_unitor_naturality'' {X Y : C} (f : X ⟶ Y) : (ρ_ X).inv ≫ (f ⊗ (𝟙 (𝟙_ C))) = f ≫ (ρ_ Y).inv :=
+by obviously
+
+@[search] lemma left_unitor_naturality'' {X Y : C} (f : X ⟶ Y) : (λ_ X).inv ≫ ((𝟙 (𝟙_ C)) ⊗ f) = f ≫ (λ_ Y).inv :=
+by obviously
+

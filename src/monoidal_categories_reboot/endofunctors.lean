@@ -56,23 +56,23 @@ def tensor_on_right : monoidal_functor.{v+1 (max u v)+1} C (C ⥤ C) :=
   ε_is_iso := by {dsimp, apply_instance}, -- TODO, once apply_instance is above ext in tidy, try omitting these
   μ_is_iso := by {dsimp, apply_instance} }.
 
--- FIXME mop needs some work
-def tensor_on_left : monoidal_functor.{v+1 (max u v)+1} C (mop (C ⥤ C)) :=
-{ obj := λ Y : C,
-  { obj := λ X, Y ⊗ X,
-    map := λ X X' f, (𝟙 Y) ⊗ f },
-  map := λ Y Y' f, { app := λ X, f ⊗ 𝟙 X },
-  ε := (monoidal_category.left_unitor_nat_iso C).inv,
-  μ := λ X Y, { app := λ Z, (monoidal_category.associator X Y Z).inv },
-  ε_is_iso := by {dsimp, apply_instance}, -- TODO, once apply_instance is above ext in tidy, try omitting these
-  μ_is_iso := by {dsimp, apply_instance}  }.
-
 @[simp] lemma tensor_on_right.obj_obj (Y X : C) : (tensor_on_right.obj Y).obj X = X ⊗ Y := rfl
 @[simp] lemma tensor_on_right.obj_map (Y : C) {X X' : C} (f : X ⟶ X') : (tensor_on_right.obj Y).map f = f ⊗ 𝟙 Y := rfl
 @[simp] lemma tensor_on_right.map_app {Y Y' : C} (f : Y ⟶ Y') (X : C) : (tensor_on_right.map f).app X = 𝟙 X ⊗ f := rfl
 
-@[simp] lemma tensor_on_left.obj_obj (Y X : C) : (tensor_on_left.obj Y).obj X = Y ⊗ X := rfl
-@[simp] lemma tensor_on_left.obj_map (Y : C) {X X' : C} (f : X ⟶ X') : (tensor_on_left.obj Y).map f = 𝟙 Y ⊗ f := rfl
-@[simp] lemma tensor_on_left.map_app {Y Y' : C} (f : Y ⟶ Y') (X : C) : (tensor_on_left.map f).app X = f ⊗ 𝟙 X := rfl
+-- -- FIXME mop needs some work
+-- def tensor_on_left : monoidal_functor.{v+1 (max u v)+1} C (mop (C ⥤ C)) :=
+-- { obj := λ Y : C,
+--   { obj := λ X, Y ⊗ X,
+--     map := λ X X' f, (𝟙 Y) ⊗ f },
+--   map := λ Y Y' f, { app := λ X, f ⊗ 𝟙 X },
+--   ε := (monoidal_category.left_unitor_nat_iso C).inv,
+--   μ := λ X Y, { app := λ Z, (monoidal_category.associator X Y Z).inv },
+--   ε_is_iso := by {dsimp, apply_instance}, -- TODO, once apply_instance is above ext in tidy, try omitting these
+--   μ_is_iso := by {dsimp, apply_instance}  }.
+
+-- @[simp] lemma tensor_on_left.obj_obj (Y X : C) : (tensor_on_left.obj Y).obj X = Y ⊗ X := rfl
+-- @[simp] lemma tensor_on_left.obj_map (Y : C) {X X' : C} (f : X ⟶ X') : (tensor_on_left.obj Y).map f = 𝟙 Y ⊗ f := rfl
+-- @[simp] lemma tensor_on_left.map_app {Y Y' : C} (f : Y ⟶ Y') (X : C) : (tensor_on_left.map f).app X = f ⊗ 𝟙 X := rfl
 
 end category_theory.monoidal

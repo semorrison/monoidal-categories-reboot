@@ -5,17 +5,17 @@ import tactic.interactive
 open category_theory
 open tactic
 
-universes u₁ u₂ u₃ u₄ v₁ v₂ v₃ v₄
+universes v₁ v₂ v₃ v₄ u₁ u₂ u₃ u₄
 
 open category_theory.category
 
-namespace category_theory.monoidal
+namespace category_theory
+
+variables {C : Type u₁} [𝒞 : monoidal_category.{v₁} C]
+          {D : Type u₂} [𝒟 : monoidal_category.{v₂} D]
+variables (F G : monoidal_functor.{v₁ v₂} C D)
 
 open monoidal_category
-
-variables {C : Type u₁} [𝒞 : monoidal_category.{v₁+1} C]
-          {D : Type u₂} [𝒟 : monoidal_category.{v₂+1} D]
-variables (F G : monoidal_functor C D)
 
 structure pseudo_natural_transformation :=
 (N : D)
@@ -23,9 +23,9 @@ structure pseudo_natural_transformation :=
 (β_natural' : Π {X X' : C} (f : X ⟶ X'), (F.map f ⊗ 𝟙 N) ≫ β X' = β X ≫ (𝟙 N ⊗ G.map f) . obviously)
 (c' : Π X Y : C,
   β (X ⊗ Y) =
-  ((F.μ X Y).inv ⊗ 𝟙 N) ≫ (associator _ _ _).hom ≫
+  ((inv (F.μ X Y)) ⊗ 𝟙 N) ≫ (associator _ _ _).hom ≫
     (𝟙 _ ⊗ (β Y)) ≫ (associator _ _ _).inv ≫
-    ((β X) ⊗ 𝟙 _) ≫ (associator _ _ _).hom ≫ (𝟙 N ⊗ (G.μ X Y).hom) . obviously)
+    ((β X) ⊗ 𝟙 _) ≫ (associator _ _ _).hom ≫ (𝟙 N ⊗ (G.μ X Y)) . obviously)
 
 restate_axiom pseudo_natural_transformation.β_natural'
 attribute [simp,search] pseudo_natural_transformation.β_natural
@@ -49,7 +49,7 @@ def β_nat_trans (σ : pseudo_natural_transformation F G) :
 { app := λ X, σ.β X,
   naturality' := λ X Y f, σ.β_natural f }
 
-variable {H : monoidal_functor C D}
+variable {H : monoidal_functor.{v₁ v₂} C D}
 
 attribute [trans] nat_trans.vcomp
 section vcomp
@@ -279,4 +279,4 @@ end modification
 
 -- TODO obtain the Drinfeld centre from these, as a braided monoidal category
 
-end category_theory.monoidal
+end category_theory

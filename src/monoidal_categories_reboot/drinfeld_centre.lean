@@ -2,33 +2,14 @@ import .braided_monoidal_category
 import .pseudo_natural_transformation
 import category_theory.functor_category
 
-universes u v u₁ v₁ u₂ v₂
-
-open category_theory
-
-namespace category_theory.is_iso
-
-variables {C : Sort u₁} [𝒞 : category.{v₁} C]
-variables {D : Sort u₂} [𝒟 : category.{v₂} D]
-include 𝒞 𝒟
-
-variables {F G : C ⥤ D}
-
-instance is_iso_of_is_iso_app (α : Π X : C, F.obj X ⟶ G.obj X) [∀ X : C, is_iso (α X)] (nat) :
-  @is_iso (C ⥤ D) (category_theory.functor.category C D) F G { app := λ X, α X, naturality' := nat } :=
-{ ..(nat_iso.of_components (λ X, as_iso (α X)) @nat) }
-
-end category_theory.is_iso
+universes v v₁ v₂ u u₁ u₂
 
 open category_theory
 
 namespace category_theory.monoidal
 
-variables {C : Sort u} [𝒞 : monoidal_category.{v} C]
+variables {C : Type u} [𝒞 : monoidal_category.{v} C]
 include 𝒞
-
-
-open monoidal_category
 
 -- We give two versions, one abstract nonsense, as `(End (1 C))`, and the other concrete.
 -- They are not-so-far from definitionally equal.

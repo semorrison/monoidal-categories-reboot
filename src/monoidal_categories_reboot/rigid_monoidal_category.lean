@@ -1,12 +1,12 @@
 -- Copyright (c) 2018 Michael Jendrusch. All rights reserved.
-import .monoidal_category
 import .braided_monoidal_category
 
 universes v u
 
-namespace category_theory.monoidal
+namespace category_theory
 
 open monoidal_category
+
 class right_duality {C : Sort u} (A A' : C) [monoidal_category.{v} C] :=
 (right_unit        : tensor_unit C ⟶ A ⊗ A')
 (right_counit      : A' ⊗ A ⟶ tensor_unit C)

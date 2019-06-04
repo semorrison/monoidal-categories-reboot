@@ -1,8 +1,5 @@
 -- Copyright (c) 2018 Michael Jendrusch. All rights reserved.
-import .monoidal_category
 import .braided_monoidal_category
-import tactic.rewrite_search
-import .monoidal_functor
 
 open tactic.rewrite_search.metric
 open tactic.rewrite_search.strategy

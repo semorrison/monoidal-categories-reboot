@@ -43,12 +43,12 @@ open monoidal_category
 open braided_monoidal_category
 open monoidal_category
 
-@[simp,search] def braiding_of_product (X Y Z : C) :
-  (braiding (X ⊗ Y) Z).hom =
-  (associator X Y Z).hom ≫ ((𝟙 X) ⊗ (braiding Y Z).hom) ≫ (associator X Z Y).inv ≫ ((braiding X Z).hom ⊗ (𝟙 Y)) ≫ (associator Z X Y).hom :=
-begin
-  sorry
-end
+-- @[simp,search] def braiding_of_product (X Y Z : C) :
+--   (braiding (X ⊗ Y) Z).hom =
+--   (associator X Y Z).hom ≫ ((𝟙 X) ⊗ (braiding Y Z).hom) ≫ (associator X Z Y).inv ≫ ((braiding X Z).hom ⊗ (𝟙 Y)) ≫ (associator Z X Y).hom :=
+-- begin
+--   sorry
+-- end
 
 end
 
