@@ -35,8 +35,8 @@ universes v u
 variables {C : Sort u} [𝒞 : monoidal_category.{v} C]
 include 𝒞
 
-@[search] lemma right_unitor_naturality' {X Y : C} (f : X ⟶ Y) : (ρ_ X).inv ≫ (f ⊗ (𝟙 (𝟙_ C))) ≫ (ρ_ Y).hom = f :=
-by obviously
+@[search] lemma right_unitor_conjugation {X Y : C} (f : X ⟶ Y) : (ρ_ X).inv ≫ (f ⊗ (𝟙 (𝟙_ C))) ≫ (ρ_ Y).hom = f :=
+by rw [right_unitor_naturality, ←category.assoc, iso.inv_hom_id, category.id_comp]
 
-@[search] lemma left_unitor_naturality' {X Y : C} (f : X ⟶ Y) : (λ_ X).inv ≫ ((𝟙 (𝟙_ C)) ⊗ f) ≫ (λ_ Y).hom = f :=
-by obviously
+@[search] lemma left_unitor_conjugation {X Y : C} (f : X ⟶ Y) : (λ_ X).inv ≫ ((𝟙 (𝟙_ C)) ⊗ f) ≫ (λ_ Y).hom = f :=
+by rw [left_unitor_naturality, ←category.assoc, iso.inv_hom_id, category.id_comp]
